@@ -1,0 +1,339 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rotate PDF - FileGenius</title>
+    <meta name="description" content="Rotate PDF document pages by 90, 180, or 270 degrees permanently directly in your browser.">
+
+    <script src="../../assets/libraries/tailwind.js"></script>
+    <link rel="stylesheet" href="../../assets/libraries/font-awesome.min.css">
+    <link rel="stylesheet" href="../../assets/css/style.css">
+    <script src="../../assets/libraries/pdf-lib.min.js"></script>
+    <script src="../../assets/js/theme.js"></script>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 font-sans antialiased min-h-screen flex flex-col transition-colors duration-200">
+
+    <header class="sticky top-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <a href="../../index.html" class="flex items-center gap-2.5 group">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center text-white shadow-md shadow-indigo-200 dark:shadow-none group-hover:scale-105 transition-transform">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                </div>
+                <span class="text-xl font-bold text-slate-900 dark:text-white">File<span class="text-indigo-600 dark:text-indigo-400">Genius</span></span>
+            </a>
+
+            <div class="flex items-center gap-3">
+                <a href="../../index.html#pdf-section" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span class="hidden sm:inline">Back to Tools</span>
+                </a>
+                <button type="button" id="quickThemeToggleBtn" class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-amber-400 flex items-center justify-center transition shadow-2xs focus:outline-none" title="Toggle Light / Dark Theme">
+                    <i class="fa-solid fa-moon dark:hidden text-sm"></i>
+                    <i class="fa-solid fa-sun hidden dark:inline text-sm"></i>
+                </button>
+                                <a href="../../contact.html" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 transition" title="Contact Administrator">
+                    <i class="fa-solid fa-envelope text-indigo-500"></i>
+                    <span class="hidden sm:inline">Contact</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 text-xs font-semibold mb-3 border border-amber-100 dark:border-amber-900">
+                <i class="fa-solid fa-arrows-rotate"></i> PDF Orientation Tool
+            </div>
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white mb-2">Rotate PDF</h1>
+            <p class="text-slate-600 dark:text-slate-400 text-sm max-w-xl mx-auto">
+                Permanently rotate individual pages or the entire document by 90Â°, 180Â°, or 270Â°.
+            </p>
+        </div>
+
+        <div id="errorAlert" class="hidden mb-6 p-4 rounded-2xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-sm flex items-center gap-3">
+            <i class="fa-solid fa-circle-exclamation flex-shrink-0 text-base"></i>
+            <span id="errorMessage"></span>
+        </div>
+
+        <div id="toolFormContainer" class="space-y-6">
+            <div id="dropZone" class="relative border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-indigo-500 rounded-3xl p-8 sm:p-12 text-center bg-white dark:bg-slate-800 transition cursor-pointer group shadow-2xs">
+                <input type="file" id="fileInput" accept="application/pdf" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                
+                <div id="uploadPrompt" class="space-y-3">
+                    <div class="w-16 h-16 rounded-2xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center mx-auto text-2xl group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                    </div>
+                    <div>
+                        <span class="text-base font-bold text-slate-800 dark:text-slate-200">Choose a PDF file to rotate</span>
+                        <span class="text-sm text-slate-500 dark:text-slate-400"> or drag and drop it here</span>
+                    </div>
+                    <p class="text-xs text-slate-400">Supports PDF documents &bull; 100% In-Browser</p>
+                </div>
+
+                <div id="previewZone" class="hidden space-y-3">
+                    <div class="w-16 h-16 rounded-2xl bg-amber-100 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center mx-auto text-2xl">
+                        <i class="fa-solid fa-file-pdf"></i>
+                    </div>
+                    <div class="text-xs font-semibold text-slate-600 dark:text-slate-300" id="fileMetaText"></div>
+                    <button type="button" id="changeFileBtn" class="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline">Choose a different PDF</button>
+                </div>
+            </div>
+
+            <div id="settingsBox" class="hidden bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 p-6 sm:p-8 shadow-xs space-y-6 transition-colors">
+                <div class="border-b border-slate-100 dark:border-slate-700/80 pb-4">
+                    <h2 class="text-base font-bold text-slate-900 dark:text-white">Rotation Settings</h2>
+                </div>
+
+                <div class="space-y-4">
+                    <!-- Page Scope: All vs Specific Pages -->
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Apply To</label>
+                        <div class="flex items-center gap-4">
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="radio" name="pageScope" value="all" checked class="text-amber-600 focus:ring-amber-500">
+                                <span class="text-xs font-bold text-slate-800 dark:text-slate-200">All Pages</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="radio" name="pageScope" value="specific" class="text-amber-600 focus:ring-amber-500">
+                                <span class="text-xs font-bold text-slate-800 dark:text-slate-200">Specific Pages</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div id="specificPagesBox" class="hidden space-y-1">
+                        <label class="block text-xs font-bold text-slate-500 uppercase">Page Numbers</label>
+                        <input type="text" id="specificPagesInput" placeholder="e.g. 1, 3, 5" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-semibold">
+                    </div>
+
+                    <!-- Rotation Angle Buttons -->
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Rotation Angle (Clockwise)</label>
+                        <div class="grid grid-cols-3 gap-3">
+                            <label class="cursor-pointer border-2 border-amber-500 rounded-2xl p-4 text-center bg-amber-50/50 dark:bg-amber-950/30 transition flex flex-col items-center gap-1.5" id="opt90">
+                                <input type="radio" name="rotAngle" value="90" checked class="sr-only">
+                                <i class="fa-solid fa-rotate-right text-lg text-amber-600 dark:text-amber-400"></i>
+                                <span class="text-xs font-extrabold text-slate-900 dark:text-white">90Â° Clockwise</span>
+                            </label>
+                            <label class="cursor-pointer border border-slate-200 dark:border-slate-700 rounded-2xl p-4 text-center hover:bg-slate-50 dark:hover:bg-slate-700 transition flex flex-col items-center gap-1.5" id="opt180">
+                                <input type="radio" name="rotAngle" value="180" class="sr-only">
+                                <i class="fa-solid fa-arrows-rotate text-lg text-amber-600 dark:text-amber-400"></i>
+                                <span class="text-xs font-extrabold text-slate-900 dark:text-white">180Â° Flip</span>
+                            </label>
+                            <label class="cursor-pointer border border-slate-200 dark:border-slate-700 rounded-2xl p-4 text-center hover:bg-slate-50 dark:hover:bg-slate-700 transition flex flex-col items-center gap-1.5" id="opt270">
+                                <input type="radio" name="rotAngle" value="270" class="sr-only">
+                                <i class="fa-solid fa-rotate-left text-lg text-amber-600 dark:text-amber-400"></i>
+                                <span class="text-xs font-extrabold text-slate-900 dark:text-white">270Â° (90Â° Left)</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-2 flex flex-wrap gap-3">
+                    <button type="button" id="processBtn" class="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-sm shadow-md shadow-amber-200 dark:shadow-none transition">
+                        <i class="fa-solid fa-arrows-rotate"></i>
+                        <span>Rotate PDF Now</span>
+                    </button>
+                    <button type="button" id="resetBtn" class="px-5 py-3.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-sm transition">
+                        Reset
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="resultContainer" class="hidden bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 p-8 shadow-sm text-center transition-colors">
+            <div class="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto mb-4 text-2xl shadow-2xs">
+                <i class="fa-solid fa-check"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-1">PDF Rotated Successfully!</h2>
+            <p class="text-slate-500 dark:text-slate-400 text-sm mb-6">Orientation updated and document re-saved.</p>
+
+            <div class="flex flex-wrap items-center justify-center gap-3">
+                <button type="button" id="downloadBtn" class="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-sm shadow-md shadow-amber-200 dark:shadow-none transition">
+                    <i class="fa-solid fa-download"></i>
+                    <span>Download Rotated PDF</span>
+                </button>
+                <button type="button" id="processAnotherBtn" class="px-5 py-3.5 rounded-xl border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-sm transition">
+                    Rotate Another PDF
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-6 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500 dark:text-slate-400">
+            &copy; 2026 FileGenius &bull; In-Browser PDF Rotation
+        </div>
+    </footer>
+
+    <script src="../../assets/js/utils.js"></script>
+    <script src="../../assets/js/navigation.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const fileInput = document.getElementById('fileInput');
+            const dropZone = document.getElementById('dropZone');
+            const uploadPrompt = document.getElementById('uploadPrompt');
+            const previewZone = document.getElementById('previewZone');
+            const fileMetaText = document.getElementById('fileMetaText');
+            const changeFileBtn = document.getElementById('changeFileBtn');
+            const settingsBox = document.getElementById('settingsBox');
+
+            const pageScopeRadios = document.querySelectorAll('input[name="pageScope"]');
+            const specificPagesBox = document.getElementById('specificPagesBox');
+            const specificPagesInput = document.getElementById('specificPagesInput');
+            const rotAngleRadios = document.querySelectorAll('input[name="rotAngle"]');
+
+            const processBtn = document.getElementById('processBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const toolFormContainer = document.getElementById('toolFormContainer');
+            const resultContainer = document.getElementById('resultContainer');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const processAnotherBtn = document.getElementById('processAnotherBtn');
+            const errorAlert = document.getElementById('errorAlert');
+            const errorMessage = document.getElementById('errorMessage');
+
+            let currentFile = null;
+            let totalPages = 0;
+            let rotatedBlob = null;
+            let downloadFileName = 'rotated.pdf';
+
+            function showError(msg) {
+                errorMessage.textContent = msg;
+                errorAlert.classList.remove('hidden');
+            }
+            function hideError() {
+                errorAlert.classList.add('hidden');
+            }
+
+            FileGenius.Utils.setupDropzone(dropZone, fileInput, (files) => {
+                if (files && files[0]) handleFile(files[0]);
+            });
+
+            changeFileBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                fileInput.click();
+            });
+
+            async function handleFile(file) {
+                hideError();
+                currentFile = file;
+
+                try {
+                    const buf = await FileGenius.Utils.readFileAsArrayBuffer(file);
+                    const { PDFDocument } = PDFLib;
+                    const doc = await PDFDocument.load(buf, { ignoreEncryption: true });
+                    totalPages = doc.getPageCount();
+
+                    fileMetaText.textContent = `${file.name} â€” ${totalPages} page${totalPages > 1 ? 's' : ''} (${FileGenius.Utils.formatBytes(file.size)})`;
+                    specificPagesInput.placeholder = `1-${totalPages} or e.g. 1, 3`;
+
+                    uploadPrompt.classList.add('hidden');
+                    previewZone.classList.remove('hidden');
+                    settingsBox.classList.remove('hidden');
+                } catch (err) {
+                    showError('Failed to read PDF file.');
+                }
+            }
+
+            pageScopeRadios.forEach(radio => {
+                radio.addEventListener('change', () => {
+                    if (radio.value === 'specific') {
+                        specificPagesBox.classList.remove('hidden');
+                    } else {
+                        specificPagesBox.classList.add('hidden');
+                    }
+                });
+            });
+
+            rotAngleRadios.forEach(radio => {
+                radio.addEventListener('change', () => {
+                    ['opt90', 'opt180', 'opt270'].forEach(id => {
+                        const lbl = document.getElementById(id);
+                        lbl.classList.remove('border-2', 'border-amber-500', 'bg-amber-50/50', 'dark:bg-amber-950/30');
+                        lbl.classList.add('border', 'border-slate-200', 'dark:border-slate-700');
+                    });
+                    const parent = radio.closest('label');
+                    parent.classList.add('border-2', 'border-amber-500', 'bg-amber-50/50', 'dark:bg-amber-950/30');
+                    parent.classList.remove('border-slate-200', 'dark:border-slate-700');
+                });
+            });
+
+            processBtn.addEventListener('click', async () => {
+                if (!currentFile) return;
+                hideError();
+
+                try {
+                    const buf = await FileGenius.Utils.readFileAsArrayBuffer(currentFile);
+                    const { PDFDocument, degrees } = PDFLib;
+                    const pdfDoc = await PDFDocument.load(buf, { ignoreEncryption: true });
+
+                    const angleDelta = parseInt(document.querySelector('input[name="rotAngle"]:checked').value);
+                    const scope = document.querySelector('input[name="pageScope"]:checked').value;
+
+                    let targetIndices = [];
+                    if (scope === 'all') {
+                        targetIndices = pdfDoc.getPageIndices();
+                    } else {
+                        const str = specificPagesInput.value.trim();
+                        if (!str) {
+                            showError('Please enter specific page numbers to rotate.');
+                            return;
+                        }
+                        const parts = str.split(',');
+                        parts.forEach(p => {
+                            const num = parseInt(p.trim());
+                            if (!isNaN(num) && num >= 1 && num <= totalPages) {
+                                targetIndices.push(num - 1);
+                            }
+                        });
+                    }
+
+                    if (targetIndices.length === 0) {
+                        showError('No valid pages found to rotate.');
+                        return;
+                    }
+
+                    targetIndices.forEach(idx => {
+                        const page = pdfDoc.getPage(idx);
+                        const currentRot = page.getRotation().angle;
+                        const newRot = (currentRot + angleDelta) % 360;
+                        page.setRotation(degrees(newRot));
+                    });
+
+                    const bytes = await pdfDoc.save();
+                    rotatedBlob = new Blob([bytes], { type: 'application/pdf' });
+                    const base = currentFile.name.replace(/\.[^.]+$/, '');
+                    downloadFileName = `${base}_rotated.pdf`;
+
+                    toolFormContainer.classList.add('hidden');
+                    resultContainer.classList.remove('hidden');
+                } catch (err) {
+                    showError('Failed to rotate PDF: ' + err.message);
+                }
+            });
+
+            downloadBtn.addEventListener('click', () => {
+                if (rotatedBlob) FileGenius.Utils.downloadBlob(rotatedBlob, downloadFileName);
+            });
+
+            function resetAll() {
+                currentFile = null;
+                totalPages = 0;
+                rotatedBlob = null;
+                fileInput.value = '';
+                uploadPrompt.classList.remove('hidden');
+                previewZone.classList.add('hidden');
+                settingsBox.classList.add('hidden');
+                resultContainer.classList.add('hidden');
+                toolFormContainer.classList.remove('hidden');
+                hideError();
+            }
+
+            resetBtn.addEventListener('click', resetAll);
+            processAnotherBtn.addEventListener('click', resetAll);
+        });
+    </script>
+</body>
+</html>
+
+

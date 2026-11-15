@@ -1,0 +1,8 @@
+FileGenius Plain Text Document
+============================
+
+This is a sample text document compiled for testing Text to PDF conversions.
+Features:
+- Fast native FPDI rendering
+- Clean margin calculations
+- Direct stream downloads.

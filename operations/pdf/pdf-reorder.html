@@ -1,0 +1,295 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reorder PDF Pages - FileGenius</title>
+    <meta name="description" content="Visual drag-and-drop PDF page thumbnail reordering and rearranging directly in your browser.">
+
+    <script src="../../assets/libraries/tailwind.js"></script>
+    <link rel="stylesheet" href="../../assets/libraries/font-awesome.min.css">
+    <link rel="stylesheet" href="../../assets/css/style.css">
+    <script src="../../assets/libraries/pdf-lib.min.js"></script>
+    <script src="../../assets/libraries/pdf.min.js"></script>
+    <script src="../../assets/js/theme.js"></script>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 font-sans antialiased min-h-screen flex flex-col transition-colors duration-200">
+
+    <header class="sticky top-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <a href="../../index.html" class="flex items-center gap-2.5 group">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center text-white shadow-md shadow-indigo-200 dark:shadow-none group-hover:scale-105 transition-transform">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                </div>
+                <span class="text-xl font-bold text-slate-900 dark:text-white">File<span class="text-indigo-600 dark:text-indigo-400">Genius</span></span>
+            </a>
+
+            <div class="flex items-center gap-3">
+                <a href="../../index.html#pdf-section" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span class="hidden sm:inline">Back to Tools</span>
+                </a>
+                <button type="button" id="quickThemeToggleBtn" class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-amber-400 flex items-center justify-center transition shadow-2xs focus:outline-none" title="Toggle Light / Dark Theme">
+                    <i class="fa-solid fa-moon dark:hidden text-sm"></i>
+                    <i class="fa-solid fa-sun hidden dark:inline text-sm"></i>
+                </button>
+                                <a href="../../contact.html" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 transition" title="Contact Administrator">
+                    <i class="fa-solid fa-envelope text-indigo-500"></i>
+                    <span class="hidden sm:inline">Contact</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 text-xs font-semibold mb-3 border border-blue-100 dark:border-blue-900">
+                <i class="fa-solid fa-arrow-down-1-9"></i> PDF Sequence Organizer
+            </div>
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white mb-2">Reorder PDF Pages</h1>
+            <p class="text-slate-600 dark:text-slate-400 text-sm max-w-xl mx-auto">
+                Rearrange pages in any sequence with interactive visual thumbnails and save the reordered PDF instantly.
+            </p>
+        </div>
+
+        <div id="errorAlert" class="hidden mb-6 p-4 rounded-2xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-sm flex items-center gap-3">
+            <i class="fa-solid fa-circle-exclamation flex-shrink-0 text-base"></i>
+            <span id="errorMessage"></span>
+        </div>
+
+        <div id="toolFormContainer" class="space-y-6">
+            <div id="dropZone" class="relative border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-indigo-500 rounded-3xl p-8 sm:p-12 text-center bg-white dark:bg-slate-800 transition cursor-pointer group shadow-2xs">
+                <input type="file" id="fileInput" accept="application/pdf" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                
+                <div id="uploadPrompt" class="space-y-3">
+                    <div class="w-16 h-16 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center mx-auto text-2xl group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                    </div>
+                    <div>
+                        <span class="text-base font-bold text-slate-800 dark:text-slate-200">Choose a PDF file to reorder</span>
+                        <span class="text-sm text-slate-500 dark:text-slate-400"> or drag and drop it here</span>
+                    </div>
+                    <p class="text-xs text-slate-400">Generates visual thumbnails locally in your browser</p>
+                </div>
+            </div>
+
+            <!-- Thumbnail Grid Workspace -->
+            <div id="reorderWorkspace" class="hidden bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 p-6 sm:p-8 shadow-xs space-y-6 transition-colors">
+                <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-700/80 pb-4">
+                    <div>
+                        <h2 class="text-base font-bold text-slate-900 dark:text-white">Page Sequence Workspace</h2>
+                        <p class="text-xs text-slate-400">Drag thumbnails or use arrows to reorganize pages into the desired sequence.</p>
+                    </div>
+                    <button type="button" id="changeFileBtn" class="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline">Change PDF</button>
+                </div>
+
+                <div id="thumbnailGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
+
+                <div class="pt-2 flex flex-wrap gap-3">
+                    <button type="button" id="processBtn" class="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-md shadow-blue-200 dark:shadow-none transition">
+                        <i class="fa-solid fa-check"></i>
+                        <span>Save Reordered PDF</span>
+                    </button>
+                    <button type="button" id="resetBtn" class="px-5 py-3.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-sm transition">
+                        Reset
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="resultContainer" class="hidden bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 p-8 shadow-sm text-center transition-colors">
+            <div class="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto mb-4 text-2xl shadow-2xs">
+                <i class="fa-solid fa-check"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-1">PDF Reordered Successfully!</h2>
+            <p class="text-slate-500 dark:text-slate-400 text-sm mb-6">New page order applied and compiled locally.</p>
+
+            <div class="flex flex-wrap items-center justify-center gap-3">
+                <button type="button" id="downloadBtn" class="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-md shadow-blue-200 dark:shadow-none transition">
+                    <i class="fa-solid fa-download"></i>
+                    <span>Download Reordered PDF</span>
+                </button>
+                <button type="button" id="processAnotherBtn" class="px-5 py-3.5 rounded-xl border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-sm transition">
+                    Reorder Another PDF
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-6 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500 dark:text-slate-400">
+            &copy; 2026 FileGenius &bull; In-Browser PDF Page Reorganizer
+        </div>
+    </footer>
+
+    <script src="../../assets/js/utils.js"></script>
+    <script src="../../assets/js/navigation.js"></script>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = '../../assets/libraries/pdf.worker.min.js';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const fileInput = document.getElementById('fileInput');
+            const dropZone = document.getElementById('dropZone');
+            const reorderWorkspace = document.getElementById('reorderWorkspace');
+            const thumbnailGrid = document.getElementById('thumbnailGrid');
+            const changeFileBtn = document.getElementById('changeFileBtn');
+
+            const processBtn = document.getElementById('processBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const toolFormContainer = document.getElementById('toolFormContainer');
+            const resultContainer = document.getElementById('resultContainer');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const processAnotherBtn = document.getElementById('processAnotherBtn');
+            const errorAlert = document.getElementById('errorAlert');
+            const errorMessage = document.getElementById('errorMessage');
+
+            let currentFile = null;
+            let pageOrder = []; // array of original 0-indexed page numbers [0, 1, 2, ...]
+            let reorderedBlob = null;
+            let downloadFileName = 'reordered.pdf';
+
+            function showError(msg) {
+                errorMessage.textContent = msg;
+                errorAlert.classList.remove('hidden');
+            }
+            function hideError() {
+                errorAlert.classList.add('hidden');
+            }
+
+            FileGenius.Utils.setupDropzone(dropZone, fileInput, (files) => {
+                if (files && files[0]) handleFile(files[0]);
+            });
+
+            changeFileBtn.addEventListener('click', () => fileInput.click());
+
+            async function handleFile(file) {
+                hideError();
+                currentFile = file;
+
+                try {
+                    const buffer = await FileGenius.Utils.readFileAsArrayBuffer(file);
+                    const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(buffer) });
+                    const pdf = await loadingTask.promise;
+                    const numPages = pdf.numPages;
+
+                    pageOrder = Array.from({ length: numPages }, (_, i) => i);
+                    thumbnailGrid.innerHTML = '';
+
+                    dropZone.classList.add('hidden');
+                    reorderWorkspace.classList.remove('hidden');
+
+                    for (let i = 1; i <= numPages; i++) {
+                        const page = await pdf.getPage(i);
+                        const viewport = page.getViewport({ scale: 0.35 });
+
+                        const canvas = document.createElement('canvas');
+                        canvas.width = viewport.width;
+                        canvas.height = viewport.height;
+                        const ctx = canvas.getContext('2d');
+                        await page.render({ canvasContext: ctx, viewport }).promise;
+
+                        const dataUrl = canvas.toDataURL();
+                        pageOrder[i - 1] = { origIndex: i - 1, imgUrl: dataUrl };
+                    }
+
+                    renderThumbnailGrid();
+                } catch (err) {
+                    showError('Failed to load PDF thumbnails: ' + err.message);
+                }
+            }
+
+            function renderThumbnailGrid() {
+                thumbnailGrid.innerHTML = '';
+                pageOrder.forEach((item, pos) => {
+                    const card = document.createElement('div');
+                    card.className = 'p-3 bg-slate-50 dark:bg-slate-900/60 rounded-2xl border border-slate-200 dark:border-slate-700 flex flex-col items-center text-center shadow-2xs group';
+                    card.innerHTML = `
+                        <div class="w-full bg-white dark:bg-slate-800 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 mb-2 p-1">
+                            <img src="${item.imgUrl}" alt="Page ${item.origIndex + 1}" class="w-full h-36 object-contain rounded">
+                        </div>
+                        <div class="flex items-center justify-between w-full px-1">
+                            <span class="text-xs font-bold text-slate-800 dark:text-slate-100">Page ${pos + 1}</span>
+                            <div class="flex items-center gap-1">
+                                <button type="button" class="btn-left p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 ${pos === 0 ? 'opacity-30 pointer-events-none' : ''}">
+                                    <i class="fa-solid fa-arrow-left text-xxs"></i>
+                                </button>
+                                <button type="button" class="btn-right p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 ${pos === pageOrder.length - 1 ? 'opacity-30 pointer-events-none' : ''}">
+                                    <i class="fa-solid fa-arrow-right text-xxs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+
+                    card.querySelector('.btn-left').addEventListener('click', () => {
+                        if (pos > 0) {
+                            const tmp = pageOrder[pos];
+                            pageOrder[pos] = pageOrder[pos - 1];
+                            pageOrder[pos - 1] = tmp;
+                            renderThumbnailGrid();
+                        }
+                    });
+
+                    card.querySelector('.btn-right').addEventListener('click', () => {
+                        if (pos < pageOrder.length - 1) {
+                            const tmp = pageOrder[pos];
+                            pageOrder[pos] = pageOrder[pos + 1];
+                            pageOrder[pos + 1] = tmp;
+                            renderThumbnailGrid();
+                        }
+                    });
+
+                    thumbnailGrid.appendChild(card);
+                });
+            }
+
+            processBtn.addEventListener('click', async () => {
+                if (!currentFile || pageOrder.length === 0) return;
+                hideError();
+
+                try {
+                    const buf = await FileGenius.Utils.readFileAsArrayBuffer(currentFile);
+                    const { PDFDocument } = PDFLib;
+                    const srcDoc = await PDFDocument.load(buf, { ignoreEncryption: true });
+                    const newDoc = await PDFDocument.create();
+
+                    const newIndices = pageOrder.map(item => item.origIndex);
+                    const copiedPages = await newDoc.copyPages(srcDoc, newIndices);
+                    copiedPages.forEach(p => newDoc.addPage(p));
+
+                    const bytes = await newDoc.save();
+                    reorderedBlob = new Blob([bytes], { type: 'application/pdf' });
+                    const base = currentFile.name.replace(/\.[^.]+$/, '');
+                    downloadFileName = `${base}_reordered.pdf`;
+
+                    toolFormContainer.classList.add('hidden');
+                    resultContainer.classList.remove('hidden');
+                } catch (err) {
+                    showError('Failed to save reordered PDF: ' + err.message);
+                }
+            });
+
+            downloadBtn.addEventListener('click', () => {
+                if (reorderedBlob) FileGenius.Utils.downloadBlob(reorderedBlob, downloadFileName);
+            });
+
+            function resetAll() {
+                currentFile = null;
+                pageOrder = [];
+                reorderedBlob = null;
+                fileInput.value = '';
+                thumbnailGrid.innerHTML = '';
+                dropZone.classList.remove('hidden');
+                reorderWorkspace.classList.add('hidden');
+                resultContainer.classList.add('hidden');
+                toolFormContainer.classList.remove('hidden');
+                hideError();
+            }
+
+            resetBtn.addEventListener('click', resetAll);
+            processAnotherBtn.addEventListener('click', resetAll);
+        });
+    </script>
+</body>
+</html>
+
+

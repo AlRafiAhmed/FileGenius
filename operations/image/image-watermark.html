@@ -1,0 +1,382 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Watermark Image - FileGenius</title>
+    <meta name="description" content="Add custom text watermarks to your pictures with 9-position placement and opacity controls in your browser.">
+
+    <script src="../../assets/libraries/tailwind.js"></script>
+    <link rel="stylesheet" href="../../assets/libraries/font-awesome.min.css">
+    <link rel="stylesheet" href="../../assets/css/style.css">
+    <script src="../../assets/js/theme.js"></script>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 font-sans antialiased min-h-screen flex flex-col transition-colors duration-200">
+
+    <header class="sticky top-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <a href="../../index.html" class="flex items-center gap-2.5 group">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center text-white shadow-md shadow-indigo-200 dark:shadow-none group-hover:scale-105 transition-transform">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                </div>
+                <span class="text-xl font-bold text-slate-900 dark:text-white">File<span class="text-indigo-600 dark:text-indigo-400">Genius</span></span>
+            </a>
+
+            <div class="flex items-center gap-3">
+                <a href="../../index.html#image-section" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span class="hidden sm:inline">Back to Tools</span>
+                </a>
+                <button type="button" id="quickThemeToggleBtn" class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-amber-400 flex items-center justify-center transition shadow-2xs focus:outline-none" title="Toggle Light / Dark Theme">
+                    <i class="fa-solid fa-moon dark:hidden text-sm"></i>
+                    <i class="fa-solid fa-sun hidden dark:inline text-sm"></i>
+                </button>
+                                <a href="../../contact.html" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 transition" title="Contact Administrator">
+                    <i class="fa-solid fa-envelope text-indigo-500"></i>
+                    <span class="hidden sm:inline">Contact</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 text-xs font-semibold mb-3 border border-sky-100 dark:border-sky-900">
+                <i class="fa-solid fa-stamp"></i> Watermark Tool
+            </div>
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white mb-2">Image Watermark</h1>
+            <p class="text-slate-600 dark:text-slate-400 text-sm max-w-xl mx-auto">
+                Protect your photography by applying customized text stamps with precision 9-point grid placement.
+            </p>
+        </div>
+
+        <div id="errorAlert" class="hidden mb-6 p-4 rounded-2xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-sm flex items-center gap-3">
+            <i class="fa-solid fa-circle-exclamation flex-shrink-0 text-base"></i>
+            <span id="errorMessage"></span>
+        </div>
+
+        <div id="toolFormContainer" class="space-y-6">
+            <div id="dropZone" class="relative border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-indigo-500 rounded-3xl p-8 sm:p-12 text-center bg-white dark:bg-slate-800 transition cursor-pointer group shadow-2xs">
+                <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                
+                <div id="uploadPrompt" class="space-y-3">
+                    <div class="w-16 h-16 rounded-2xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center mx-auto text-2xl group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                    </div>
+                    <div>
+                        <span class="text-base font-bold text-slate-800 dark:text-slate-200">Choose an image to watermark</span>
+                        <span class="text-sm text-slate-500 dark:text-slate-400"> or drag and drop it here</span>
+                    </div>
+                    <p class="text-xs text-slate-400">Supports JPG, PNG, and WebP &bull; 100% In-Browser</p>
+                </div>
+
+                <div id="previewZone" class="hidden space-y-3">
+                    <div class="max-h-72 mx-auto rounded-xl overflow-hidden inline-block border border-slate-200 dark:border-slate-700 bg-checkered p-2">
+                        <canvas id="livePreviewCanvas" class="max-h-64 mx-auto object-contain rounded-lg"></canvas>
+                    </div>
+                    <div class="text-xs font-semibold text-slate-600 dark:text-slate-300" id="fileMetaText"></div>
+                    <button type="button" id="changeFileBtn" class="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline">Choose a different image</button>
+                </div>
+            </div>
+
+            <div id="settingsBox" class="hidden bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 p-6 sm:p-8 shadow-xs space-y-6 transition-colors">
+                <div class="border-b border-slate-100 dark:border-slate-700/80 pb-4">
+                    <h2 class="text-base font-bold text-slate-900 dark:text-white">Watermark Configuration</h2>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <!-- Text -->
+                    <div class="sm:col-span-2">
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">Watermark Text</label>
+                        <input type="text" id="watermarkText" value="Â© FileGenius Confidential" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-sky-500">
+                    </div>
+
+                    <!-- Font size & Opacity -->
+                    <div>
+                        <div class="flex justify-between items-center mb-1.5">
+                            <label class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Font Size (px)</label>
+                            <span id="fontSizeDisplay" class="text-xs font-bold text-sky-600 dark:text-sky-400">36 px</span>
+                        </div>
+                        <input type="range" id="fontSizeSlider" min="12" max="140" value="36" class="w-full accent-sky-500">
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between items-center mb-1.5">
+                            <label class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Opacity</label>
+                            <span id="opacityDisplay" class="text-xs font-bold text-sky-600 dark:text-sky-400">60%</span>
+                        </div>
+                        <input type="range" id="opacitySlider" min="10" max="100" value="60" class="w-full accent-sky-500">
+                    </div>
+
+                    <!-- Color -->
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">Text Color</label>
+                        <div class="flex items-center gap-3">
+                            <input type="color" id="watermarkColor" value="#ffffff" class="w-12 h-10 p-1 rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer bg-transparent">
+                            <input type="text" id="watermarkColorText" value="#ffffff" class="w-28 px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-mono font-semibold">
+                        </div>
+                    </div>
+
+                    <!-- 9-Position Placement Grid -->
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">Placement Position</label>
+                        <div class="grid grid-cols-3 gap-1.5 w-36">
+                            <button type="button" data-pos="top-left" class="pos-btn p-2 rounded-lg bg-slate-100 dark:bg-slate-700 text-xxs font-bold hover:bg-slate-200">TL</button>
+                            <button type="button" data-pos="top-center" class="pos-btn p-2 rounded-lg bg-slate-100 dark:bg-slate-700 text-xxs font-bold hover:bg-slate-200">TC</button>
+                            <button type="button" data-pos="top-right" class="pos-btn p-2 rounded-lg bg-slate-100 dark:bg-slate-700 text-xxs font-bold hover:bg-slate-200">TR</button>
+                            <button type="button" data-pos="middle-left" class="pos-btn p-2 rounded-lg bg-slate-100 dark:bg-slate-700 text-xxs font-bold hover:bg-slate-200">ML</button>
+                            <button type="button" data-pos="center" class="pos-btn p-2 rounded-lg bg-slate-100 dark:bg-slate-700 text-xxs font-bold hover:bg-slate-200">C</button>
+                            <button type="button" data-pos="middle-right" class="pos-btn p-2 rounded-lg bg-slate-100 dark:bg-slate-700 text-xxs font-bold hover:bg-slate-200">MR</button>
+                            <button type="button" data-pos="bottom-left" class="pos-btn p-2 rounded-lg bg-slate-100 dark:bg-slate-700 text-xxs font-bold hover:bg-slate-200">BL</button>
+                            <button type="button" data-pos="bottom-center" class="pos-btn p-2 rounded-lg bg-slate-100 dark:bg-slate-700 text-xxs font-bold hover:bg-slate-200">BC</button>
+                            <button type="button" data-pos="bottom-right" class="pos-btn p-2 rounded-lg bg-sky-600 text-white text-xxs font-bold shadow-2xs">BR</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-2 flex flex-wrap gap-3">
+                    <button type="button" id="processBtn" class="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-sm shadow-md shadow-sky-200 dark:shadow-none transition">
+                        <i class="fa-solid fa-stamp"></i>
+                        <span>Apply & Export Watermarked Image</span>
+                    </button>
+                    <button type="button" id="resetBtn" class="px-5 py-3.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-sm transition">
+                        Reset
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="resultContainer" class="hidden bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 p-8 shadow-sm text-center transition-colors">
+            <div class="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto mb-4 text-2xl shadow-2xs">
+                <i class="fa-solid fa-check"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-1">Watermark Applied!</h2>
+            <p class="text-slate-500 dark:text-slate-400 text-sm mb-6">Your watermarked image is stamped and ready to download.</p>
+
+            <div class="max-w-md mx-auto mb-8 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700 p-2 bg-checkered">
+                <img id="resultImagePreview" src="#" alt="Watermarked Image" class="max-h-64 mx-auto object-contain rounded-xl">
+            </div>
+
+            <div class="flex flex-wrap items-center justify-center gap-3">
+                <button type="button" id="downloadBtn" class="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-sm shadow-md shadow-sky-200 dark:shadow-none transition">
+                    <i class="fa-solid fa-download"></i>
+                    <span>Download Watermarked Image</span>
+                </button>
+                <button type="button" id="processAnotherBtn" class="px-5 py-3.5 rounded-xl border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-sm transition">
+                    Watermark Another Image
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-6 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500 dark:text-slate-400">
+            &copy; 2026 FileGenius &bull; In-Browser Image Watermark
+        </div>
+    </footer>
+
+    <script src="../../assets/js/utils.js"></script>
+    <script src="../../assets/js/navigation.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const fileInput = document.getElementById('fileInput');
+            const dropZone = document.getElementById('dropZone');
+            const uploadPrompt = document.getElementById('uploadPrompt');
+            const previewZone = document.getElementById('previewZone');
+            const livePreviewCanvas = document.getElementById('livePreviewCanvas');
+            const fileMetaText = document.getElementById('fileMetaText');
+            const changeFileBtn = document.getElementById('changeFileBtn');
+            const settingsBox = document.getElementById('settingsBox');
+
+            const watermarkText = document.getElementById('watermarkText');
+            const fontSizeSlider = document.getElementById('fontSizeSlider');
+            const fontSizeDisplay = document.getElementById('fontSizeDisplay');
+            const opacitySlider = document.getElementById('opacitySlider');
+            const opacityDisplay = document.getElementById('opacityDisplay');
+            const watermarkColor = document.getElementById('watermarkColor');
+            const watermarkColorText = document.getElementById('watermarkColorText');
+            const posBtns = document.querySelectorAll('.pos-btn');
+
+            const processBtn = document.getElementById('processBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const toolFormContainer = document.getElementById('toolFormContainer');
+            const resultContainer = document.getElementById('resultContainer');
+            const resultImagePreview = document.getElementById('resultImagePreview');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const processAnotherBtn = document.getElementById('processAnotherBtn');
+            const errorAlert = document.getElementById('errorAlert');
+            const errorMessage = document.getElementById('errorMessage');
+
+            let currentFile = null;
+            let loadedImage = null;
+            let currentPosition = 'bottom-right';
+            let watermarkedBlob = null;
+            let downloadFileName = 'watermarked.jpg';
+
+            function showError(msg) {
+                errorMessage.textContent = msg;
+                errorAlert.classList.remove('hidden');
+            }
+            function hideError() {
+                errorAlert.classList.add('hidden');
+            }
+
+            FileGenius.Utils.setupDropzone(dropZone, fileInput, (files) => {
+                if (files && files[0]) handleFile(files[0]);
+            });
+
+            changeFileBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                fileInput.click();
+            });
+
+            async function handleFile(file) {
+                hideError();
+                currentFile = file;
+
+                try {
+                    const img = await FileGenius.Utils.loadImage(file);
+                    loadedImage = img;
+                    fileMetaText.textContent = `${file.name} â€” ${img.naturalWidth} Ã— ${img.naturalHeight} px (${FileGenius.Utils.formatBytes(file.size)})`;
+
+                    uploadPrompt.classList.add('hidden');
+                    previewZone.classList.remove('hidden');
+                    settingsBox.classList.remove('hidden');
+
+                    renderLivePreview();
+                } catch (err) {
+                    showError('Failed to load image.');
+                }
+            }
+
+            function renderLivePreview() {
+                if (!loadedImage) return;
+
+                const nw = loadedImage.naturalWidth;
+                const nh = loadedImage.naturalHeight;
+                livePreviewCanvas.width = nw;
+                livePreviewCanvas.height = nh;
+                const ctx = livePreviewCanvas.getContext('2d');
+
+                ctx.drawImage(loadedImage, 0, 0);
+
+                const text = watermarkText.value || '';
+                const fontSize = parseInt(fontSizeSlider.value);
+                const opacity = parseInt(opacitySlider.value) / 100;
+                const color = watermarkColor.value;
+
+                ctx.save();
+                ctx.globalAlpha = opacity;
+                ctx.font = `bold ${fontSize}px sans-serif`;
+                ctx.fillStyle = color;
+                ctx.textBaseline = 'middle';
+
+                // Add subtle shadow for visibility on any background
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
+                ctx.shadowBlur = 6;
+                ctx.shadowOffsetX = 2;
+                ctx.shadowOffsetY = 2;
+
+                const textWidth = ctx.measureText(text).width;
+                const pad = 30;
+
+                let tx = pad;
+                let ty = pad + (fontSize / 2);
+
+                if (currentPosition.includes('center')) tx = (nw - textWidth) / 2;
+                if (currentPosition.includes('right')) tx = nw - textWidth - pad;
+                if (currentPosition === 'center') {
+                    tx = (nw - textWidth) / 2;
+                    ty = nh / 2;
+                }
+                if (currentPosition.includes('middle')) ty = nh / 2;
+                if (currentPosition.includes('bottom')) ty = nh - pad - (fontSize / 2);
+
+                ctx.fillText(text, tx, ty);
+                ctx.restore();
+            }
+
+            // Controls listeners
+            watermarkText.addEventListener('input', renderLivePreview);
+            fontSizeSlider.addEventListener('input', () => {
+                fontSizeDisplay.textContent = fontSizeSlider.value + ' px';
+                renderLivePreview();
+            });
+            opacitySlider.addEventListener('input', () => {
+                opacityDisplay.textContent = opacitySlider.value + '%';
+                renderLivePreview();
+            });
+            watermarkColor.addEventListener('input', () => {
+                watermarkColorText.value = watermarkColor.value;
+                renderLivePreview();
+            });
+            watermarkColorText.addEventListener('input', () => {
+                if (/^#[0-9A-Fa-f]{6}$/.test(watermarkColorText.value)) {
+                    watermarkColor.value = watermarkColorText.value;
+                    renderLivePreview();
+                }
+            });
+
+            posBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    posBtns.forEach(b => {
+                        b.classList.remove('bg-sky-600', 'text-white', 'shadow-2xs');
+                        b.classList.add('bg-slate-100', 'dark:bg-slate-700', 'text-slate-800', 'dark:text-slate-200');
+                    });
+                    btn.classList.add('bg-sky-600', 'text-white', 'shadow-2xs');
+                    btn.classList.remove('bg-slate-100', 'dark:bg-slate-700');
+
+                    currentPosition = btn.getAttribute('data-pos');
+                    renderLivePreview();
+                });
+            });
+
+            processBtn.addEventListener('click', () => {
+                if (!loadedImage) return;
+
+                renderLivePreview();
+                const mime = currentFile.type || 'image/jpeg';
+                livePreviewCanvas.toBlob((blob) => {
+                    if (!blob) {
+                        showError('Failed to generate stamped watermark image.');
+                        return;
+                    }
+                    watermarkedBlob = blob;
+                    const ext = mime === 'image/png' ? '.png' : (mime === 'image/webp' ? '.webp' : '.jpg');
+                    const base = currentFile.name.replace(/\.[^.]+$/, '');
+                    downloadFileName = `${base}_watermarked${ext}`;
+
+                    resultImagePreview.src = URL.createObjectURL(blob);
+                    toolFormContainer.classList.add('hidden');
+                    resultContainer.classList.remove('hidden');
+                }, mime, 0.95);
+            });
+
+            downloadBtn.addEventListener('click', () => {
+                if (watermarkedBlob) FileGenius.Utils.downloadBlob(watermarkedBlob, downloadFileName);
+            });
+
+            function resetAll() {
+                currentFile = null;
+                loadedImage = null;
+                watermarkedBlob = null;
+                fileInput.value = '';
+                const ctx = livePreviewCanvas.getContext('2d');
+                ctx.clearRect(0, 0, livePreviewCanvas.width, livePreviewCanvas.height);
+                resultImagePreview.src = '#';
+                uploadPrompt.classList.remove('hidden');
+                previewZone.classList.add('hidden');
+                settingsBox.classList.add('hidden');
+                resultContainer.classList.add('hidden');
+                toolFormContainer.classList.remove('hidden');
+                hideError();
+            }
+
+            resetBtn.addEventListener('click', resetAll);
+            processAnotherBtn.addEventListener('click', resetAll);
+        });
+    </script>
+</body>
+</html>
+
+

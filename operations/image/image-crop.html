@@ -1,0 +1,438 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crop Image - FileGenius</title>
+    <meta name="description" content="Interactively crop images with custom coordinates or aspect ratio presets directly in your browser.">
+
+    <script src="../../assets/libraries/tailwind.js"></script>
+    <link rel="stylesheet" href="../../assets/libraries/font-awesome.min.css">
+    <link rel="stylesheet" href="../../assets/css/style.css">
+    <script src="../../assets/js/theme.js"></script>
+    <style>
+        #cropWrapper {
+            position: relative;
+            display: inline-block;
+            user-select: none;
+            max-width: 100%;
+        }
+        #cropOverlay {
+            position: absolute;
+            border: 2px dashed #6366f1;
+            background: rgba(99, 102, 241, 0.2);
+            cursor: move;
+            box-sizing: border-box;
+        }
+        .crop-handle {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: #ffffff;
+            border: 2px solid #6366f1;
+            border-radius: 2px;
+        }
+        .handle-se { right: -6px; bottom: -6px; cursor: se-resize; }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 font-sans antialiased min-h-screen flex flex-col transition-colors duration-200">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <a href="../../index.html" class="flex items-center gap-2.5 group">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center text-white shadow-md shadow-indigo-200 dark:shadow-none group-hover:scale-105 transition-transform">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                </div>
+                <span class="text-xl font-bold text-slate-900 dark:text-white">File<span class="text-indigo-600 dark:text-indigo-400">Genius</span></span>
+            </a>
+
+            <div class="flex items-center gap-3">
+                <a href="../../index.html#image-section" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span class="hidden sm:inline">Back to Tools</span>
+                </a>
+
+                <button type="button" id="quickThemeToggleBtn" class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-amber-400 flex items-center justify-center transition shadow-2xs focus:outline-none" title="Toggle Light / Dark Theme">
+                    <i class="fa-solid fa-moon dark:hidden text-sm"></i>
+                    <i class="fa-solid fa-sun hidden dark:inline text-sm"></i>
+                </button>
+
+                                <a href="../../contact.html" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 transition" title="Contact Administrator">
+                    <i class="fa-solid fa-envelope text-indigo-500"></i>
+                    <span class="hidden sm:inline">Contact</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-grow max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 text-xs font-semibold mb-3 border border-indigo-100 dark:border-indigo-900">
+                <i class="fa-solid fa-crop"></i> Image Precision Crop
+            </div>
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white mb-2">Crop Image</h1>
+            <p class="text-slate-600 dark:text-slate-400 text-sm max-w-xl mx-auto">
+                Crop unwanted edges, focus on specific subjects, or enforce standard aspect ratios visually.
+            </p>
+        </div>
+
+        <div id="errorAlert" class="hidden mb-6 p-4 rounded-2xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-sm flex items-center gap-3">
+            <i class="fa-solid fa-circle-exclamation flex-shrink-0 text-base"></i>
+            <span id="errorMessage"></span>
+        </div>
+
+        <div id="toolFormContainer" class="space-y-6">
+            <!-- Dropzone -->
+            <div id="dropZone" class="relative border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-indigo-500 rounded-3xl p-8 sm:p-12 text-center bg-white dark:bg-slate-800 transition cursor-pointer group shadow-2xs">
+                <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                
+                <div id="uploadPrompt" class="space-y-3">
+                    <div class="w-16 h-16 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mx-auto text-2xl group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                    </div>
+                    <div>
+                        <span class="text-base font-bold text-slate-800 dark:text-slate-200">Choose an image to crop</span>
+                        <span class="text-sm text-slate-500 dark:text-slate-400"> or drag and drop it here</span>
+                    </div>
+                    <p class="text-xs text-slate-400">Supports JPG, PNG, and WebP &bull; 100% In-Browser</p>
+                </div>
+            </div>
+
+            <!-- Interactive Workspace -->
+            <div id="cropWorkspace" class="hidden bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 p-6 sm:p-8 shadow-xs space-y-6 transition-colors">
+                <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-700/80 pb-4">
+                    <div>
+                        <h2 class="text-base font-bold text-slate-900 dark:text-white">Interactive Crop Canvas</h2>
+                        <p class="text-xs text-slate-400">Drag the frame to reposition; drag the bottom-right corner to resize.</p>
+                    </div>
+                    <button type="button" id="changeImageBtn" class="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline">Change Image</button>
+                </div>
+
+                <!-- Aspect Ratio Presets -->
+                <div class="flex flex-wrap items-center gap-2">
+                    <span class="text-xs font-bold text-slate-500 dark:text-slate-400 mr-1">Aspect Ratio:</span>
+                    <button type="button" data-ratio="free" class="ratio-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow-2xs">Freeform</button>
+                    <button type="button" data-ratio="1:1" class="ratio-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200">1:1 Square</button>
+                    <button type="button" data-ratio="4:3" class="ratio-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200">4:3 Photo</button>
+                    <button type="button" data-ratio="16:9" class="ratio-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200">16:9 Wide</button>
+                    <button type="button" data-ratio="3:2" class="ratio-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200">3:2 Classic</button>
+                </div>
+
+                <!-- Canvas Display Container -->
+                <div class="text-center overflow-auto p-4 bg-slate-100 dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 flex justify-center">
+                    <div id="cropWrapper">
+                        <img id="cropTargetImg" src="#" alt="Crop Source" class="max-h-[500px] object-contain rounded-lg block">
+                        <div id="cropOverlay">
+                            <div class="crop-handle handle-se" id="handleSe"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Dimension Metrics -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+                    <div class="p-3 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-200/80 dark:border-slate-700/60">
+                        <span class="text-xxs font-bold uppercase text-slate-400">Crop X</span>
+                        <div id="metricX" class="text-sm font-bold text-slate-800 dark:text-slate-200">0 px</div>
+                    </div>
+                    <div class="p-3 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-200/80 dark:border-slate-700/60">
+                        <span class="text-xxs font-bold uppercase text-slate-400">Crop Y</span>
+                        <div id="metricY" class="text-sm font-bold text-slate-800 dark:text-slate-200">0 px</div>
+                    </div>
+                    <div class="p-3 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-200/80 dark:border-slate-700/60">
+                        <span class="text-xxs font-bold uppercase text-slate-400">Crop Width</span>
+                        <div id="metricW" class="text-sm font-bold text-slate-800 dark:text-slate-200">0 px</div>
+                    </div>
+                    <div class="p-3 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-200/80 dark:border-slate-700/60">
+                        <span class="text-xxs font-bold uppercase text-slate-400">Crop Height</span>
+                        <div id="metricH" class="text-sm font-bold text-slate-800 dark:text-slate-200">0 px</div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="pt-2 flex flex-wrap gap-3">
+                    <button type="button" id="processBtn" class="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-md shadow-indigo-200 dark:shadow-none transition">
+                        <i class="fa-solid fa-crop"></i>
+                        <span>Apply Crop & Export</span>
+                    </button>
+                    <button type="button" id="resetBtn" class="px-5 py-3.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-sm transition">
+                        Reset
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Output / Result Card -->
+        <div id="resultContainer" class="hidden bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 p-8 shadow-sm text-center transition-colors">
+            <div class="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto mb-4 text-2xl shadow-2xs">
+                <i class="fa-solid fa-check"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-1">Image Cropped Successfully!</h2>
+            <p class="text-slate-500 dark:text-slate-400 text-sm mb-6">Your cropped output is ready for download.</p>
+
+            <div class="max-w-md mx-auto mb-8 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700 p-2 bg-checkered">
+                <img id="resultImagePreview" src="#" alt="Cropped Result" class="max-h-64 mx-auto object-contain rounded-xl">
+            </div>
+
+            <div class="flex flex-wrap items-center justify-center gap-3">
+                <button type="button" id="downloadBtn" class="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-md shadow-indigo-200 dark:shadow-none transition">
+                    <i class="fa-solid fa-download"></i>
+                    <span>Download Cropped Image</span>
+                </button>
+                <button type="button" id="processAnotherBtn" class="px-5 py-3.5 rounded-xl border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-sm transition">
+                    Crop Another Image
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-6 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500 dark:text-slate-400">
+            &copy; 2026 FileGenius &bull; In-Browser Image Crop
+        </div>
+    </footer>
+
+    <script src="../../assets/js/utils.js"></script>
+    <script src="../../assets/js/navigation.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const fileInput = document.getElementById('fileInput');
+            const dropZone = document.getElementById('dropZone');
+            const cropWorkspace = document.getElementById('cropWorkspace');
+            const cropTargetImg = document.getElementById('cropTargetImg');
+            const cropOverlay = document.getElementById('cropOverlay');
+            const handleSe = document.getElementById('handleSe');
+            const changeImageBtn = document.getElementById('changeImageBtn');
+
+            const metricX = document.getElementById('metricX');
+            const metricY = document.getElementById('metricY');
+            const metricW = document.getElementById('metricW');
+            const metricH = document.getElementById('metricH');
+
+            const ratioBtns = document.querySelectorAll('.ratio-btn');
+            const processBtn = document.getElementById('processBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const toolFormContainer = document.getElementById('toolFormContainer');
+            const resultContainer = document.getElementById('resultContainer');
+            const resultImagePreview = document.getElementById('resultImagePreview');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const processAnotherBtn = document.getElementById('processAnotherBtn');
+            const errorAlert = document.getElementById('errorAlert');
+            const errorMessage = document.getElementById('errorMessage');
+
+            let currentFile = null;
+            let loadedImage = null;
+            let croppedBlob = null;
+            let downloadFileName = 'cropped.jpg';
+            let activeRatio = 'free';
+
+            let box = { x: 20, y: 20, w: 150, h: 150 };
+            let isDragging = false;
+            let isResizing = false;
+            let dragStartX = 0, dragStartY = 0;
+            let initialBox = { ...box };
+
+            function showError(msg) {
+                errorMessage.textContent = msg;
+                errorAlert.classList.remove('hidden');
+            }
+            function hideError() {
+                errorAlert.classList.add('hidden');
+            }
+
+            FileGenius.Utils.setupDropzone(dropZone, fileInput, (files) => {
+                if (files && files[0]) handleFile(files[0]);
+            });
+
+            changeImageBtn.addEventListener('click', () => fileInput.click());
+
+            async function handleFile(file) {
+                hideError();
+                currentFile = file;
+                try {
+                    const img = await FileGenius.Utils.loadImage(file);
+                    loadedImage = img;
+                    cropTargetImg.src = img.src;
+
+                    cropTargetImg.onload = () => {
+                        const dispW = cropTargetImg.clientWidth;
+                        const dispH = cropTargetImg.clientHeight;
+                        box.w = Math.round(dispW * 0.7);
+                        box.h = Math.round(dispH * 0.7);
+                        box.x = Math.round((dispW - box.w) / 2);
+                        box.y = Math.round((dispH - box.h) / 2);
+                        applyCropRatioConstraint();
+                        updateOverlayPosition();
+
+                        dropZone.classList.add('hidden');
+                        cropWorkspace.classList.remove('hidden');
+                    };
+                } catch (err) {
+                    showError('Failed to load image for cropping.');
+                }
+            }
+
+            function updateOverlayPosition() {
+                cropOverlay.style.left = box.x + 'px';
+                cropOverlay.style.top = box.y + 'px';
+                cropOverlay.style.width = box.w + 'px';
+                cropOverlay.style.height = box.h + 'px';
+
+                // Calculate actual image pixel values
+                const scaleX = loadedImage.naturalWidth / cropTargetImg.clientWidth;
+                const scaleY = loadedImage.naturalHeight / cropTargetImg.clientHeight;
+
+                metricX.textContent = Math.round(box.x * scaleX) + ' px';
+                metricY.textContent = Math.round(box.y * scaleY) + ' px';
+                metricW.textContent = Math.round(box.w * scaleX) + ' px';
+                metricH.textContent = Math.round(box.h * scaleY) + ' px';
+            }
+
+            // Ratio selection
+            ratioBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    ratioBtns.forEach(b => {
+                        b.classList.remove('bg-indigo-600', 'text-white', 'shadow-2xs');
+                        b.classList.add('bg-slate-100', 'dark:bg-slate-700', 'text-slate-700', 'dark:text-slate-200');
+                    });
+                    btn.classList.add('bg-indigo-600', 'text-white', 'shadow-2xs');
+                    btn.classList.remove('bg-slate-100', 'dark:bg-slate-700', 'text-slate-700', 'dark:text-slate-200');
+
+                    activeRatio = btn.getAttribute('data-ratio');
+                    applyCropRatioConstraint();
+                    updateOverlayPosition();
+                });
+            });
+
+            function applyCropRatioConstraint() {
+                if (activeRatio === 'free') return;
+                const [rw, rh] = activeRatio.split(':').map(Number);
+                const targetRatio = rw / rh;
+                box.h = Math.round(box.w / targetRatio);
+
+                const maxH = cropTargetImg.clientHeight;
+                if (box.y + box.h > maxH) {
+                    box.h = maxH - box.y;
+                    box.w = Math.round(box.h * targetRatio);
+                }
+            }
+
+            // Dragging overlay
+            cropOverlay.addEventListener('mousedown', (e) => {
+                if (e.target === handleSe) return;
+                isDragging = true;
+                dragStartX = e.clientX;
+                dragStartY = e.clientY;
+                initialBox = { ...box };
+                e.preventDefault();
+            });
+
+            // Resizing overlay
+            handleSe.addEventListener('mousedown', (e) => {
+                isResizing = true;
+                dragStartX = e.clientX;
+                dragStartY = e.clientY;
+                initialBox = { ...box };
+                e.stopPropagation();
+                e.preventDefault();
+            });
+
+            window.addEventListener('mousemove', (e) => {
+                if (!isDragging && !isResizing) return;
+                const dx = e.clientX - dragStartX;
+                const dy = e.clientY - dragStartY;
+                const maxW = cropTargetImg.clientWidth;
+                const maxH = cropTargetImg.clientHeight;
+
+                if (isDragging) {
+                    box.x = Math.max(0, Math.min(maxW - box.w, initialBox.x + dx));
+                    box.y = Math.max(0, Math.min(maxH - box.h, initialBox.y + dy));
+                } else if (isResizing) {
+                    let newW = Math.max(30, Math.min(maxW - initialBox.x, initialBox.w + dx));
+                    let newH = Math.max(30, Math.min(maxH - initialBox.y, initialBox.h + dy));
+
+                    if (activeRatio !== 'free') {
+                        const [rw, rh] = activeRatio.split(':').map(Number);
+                        const ratio = rw / rh;
+                        newH = Math.round(newW / ratio);
+                        if (initialBox.y + newH > maxH) {
+                            newH = maxH - initialBox.y;
+                            newW = Math.round(newH * ratio);
+                        }
+                    }
+                    box.w = newW;
+                    box.h = newH;
+                }
+                updateOverlayPosition();
+            });
+
+            window.addEventListener('mouseup', () => {
+                isDragging = false;
+                isResizing = false;
+            });
+
+            // Process crop
+            processBtn.addEventListener('click', () => {
+                if (!loadedImage) return;
+
+                const scaleX = loadedImage.naturalWidth / cropTargetImg.clientWidth;
+                const scaleY = loadedImage.naturalHeight / cropTargetImg.clientHeight;
+
+                const realX = Math.round(box.x * scaleX);
+                const realY = Math.round(box.y * scaleY);
+                const realW = Math.round(box.w * scaleX);
+                const realH = Math.round(box.h * scaleY);
+
+                const canvas = document.createElement('canvas');
+                canvas.width = realW;
+                canvas.height = realH;
+                const ctx = canvas.getContext('2d');
+                ctx.imageSmoothingEnabled = true;
+                ctx.imageSmoothingQuality = 'high';
+
+                ctx.drawImage(loadedImage, realX, realY, realW, realH, 0, 0, realW, realH);
+
+                const mime = currentFile.type || 'image/jpeg';
+                canvas.toBlob((blob) => {
+                    if (!blob) {
+                        showError('Crop rendering failed.');
+                        return;
+                    }
+                    croppedBlob = blob;
+                    const ext = mime === 'image/png' ? '.png' : (mime === 'image/webp' ? '.webp' : '.jpg');
+                    const base = currentFile.name.replace(/\.[^.]+$/, '');
+                    downloadFileName = `${base}_cropped${ext}`;
+
+                    resultImagePreview.src = URL.createObjectURL(blob);
+                    toolFormContainer.classList.add('hidden');
+                    resultContainer.classList.remove('hidden');
+                }, mime, 0.95);
+            });
+
+            downloadBtn.addEventListener('click', () => {
+                if (croppedBlob) FileGenius.Utils.downloadBlob(croppedBlob, downloadFileName);
+            });
+
+            function resetAll() {
+                currentFile = null;
+                loadedImage = null;
+                croppedBlob = null;
+                fileInput.value = '';
+                cropTargetImg.src = '#';
+                resultImagePreview.src = '#';
+                dropZone.classList.remove('hidden');
+                cropWorkspace.classList.add('hidden');
+                resultContainer.classList.add('hidden');
+                toolFormContainer.classList.remove('hidden');
+                hideError();
+            }
+
+            resetBtn.addEventListener('click', resetAll);
+            processAnotherBtn.addEventListener('click', resetAll);
+        });
+    </script>
+</body>
+</html>
+
+

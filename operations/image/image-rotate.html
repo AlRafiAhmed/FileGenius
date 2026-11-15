@@ -1,0 +1,326 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rotate Image - FileGenius</title>
+    <meta name="description" content="Rotate images 90, 180, 270 degrees or flip horizontally and vertically in your browser.">
+
+    <script src="../../assets/libraries/tailwind.js"></script>
+    <link rel="stylesheet" href="../../assets/libraries/font-awesome.min.css">
+    <link rel="stylesheet" href="../../assets/css/style.css">
+    <script src="../../assets/js/theme.js"></script>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 font-sans antialiased min-h-screen flex flex-col transition-colors duration-200">
+
+    <header class="sticky top-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <a href="../../index.html" class="flex items-center gap-2.5 group">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center text-white shadow-md shadow-indigo-200 dark:shadow-none group-hover:scale-105 transition-transform">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                </div>
+                <span class="text-xl font-bold text-slate-900 dark:text-white">File<span class="text-indigo-600 dark:text-indigo-400">Genius</span></span>
+            </a>
+
+            <div class="flex items-center gap-3">
+                <a href="../../index.html#image-section" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span class="hidden sm:inline">Back to Tools</span>
+                </a>
+                <button type="button" id="quickThemeToggleBtn" class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-amber-400 flex items-center justify-center transition shadow-2xs focus:outline-none" title="Toggle Light / Dark Theme">
+                    <i class="fa-solid fa-moon dark:hidden text-sm"></i>
+                    <i class="fa-solid fa-sun hidden dark:inline text-sm"></i>
+                </button>
+                                <a href="../../contact.html" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 transition" title="Contact Administrator">
+                    <i class="fa-solid fa-envelope text-indigo-500"></i>
+                    <span class="hidden sm:inline">Contact</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 text-xs font-semibold mb-3 border border-purple-100 dark:border-purple-900">
+                <i class="fa-solid fa-rotate"></i> Image Orientation Tool
+            </div>
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white mb-2">Rotate Image</h1>
+            <p class="text-slate-600 dark:text-slate-400 text-sm max-w-xl mx-auto">
+                Rotate your photos by 90Â°, 180Â°, or 270Â°, or mirror horizontally and vertically with zero quality loss.
+            </p>
+        </div>
+
+        <div id="errorAlert" class="hidden mb-6 p-4 rounded-2xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-sm flex items-center gap-3">
+            <i class="fa-solid fa-circle-exclamation flex-shrink-0 text-base"></i>
+            <span id="errorMessage"></span>
+        </div>
+
+        <div id="toolFormContainer" class="space-y-6">
+            <div id="dropZone" class="relative border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-indigo-500 rounded-3xl p-8 sm:p-12 text-center bg-white dark:bg-slate-800 transition cursor-pointer group shadow-2xs">
+                <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                
+                <div id="uploadPrompt" class="space-y-3">
+                    <div class="w-16 h-16 rounded-2xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center mx-auto text-2xl group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                    </div>
+                    <div>
+                        <span class="text-base font-bold text-slate-800 dark:text-slate-200">Choose an image to rotate</span>
+                        <span class="text-sm text-slate-500 dark:text-slate-400"> or drag and drop it here</span>
+                    </div>
+                    <p class="text-xs text-slate-400">Supports JPG, PNG, and WebP &bull; 100% In-Browser</p>
+                </div>
+
+                <div id="previewZone" class="hidden space-y-3">
+                    <div class="max-h-72 mx-auto rounded-xl overflow-hidden inline-block border border-slate-200 dark:border-slate-700 bg-checkered p-2">
+                        <img id="sourceImagePreview" src="#" alt="Rotation Preview" class="max-h-64 mx-auto object-contain rounded-lg transition-transform duration-200">
+                    </div>
+                    <div class="text-xs font-semibold text-slate-600 dark:text-slate-300" id="fileMetaText"></div>
+                    <button type="button" id="changeFileBtn" class="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline">Choose a different image</button>
+                </div>
+            </div>
+
+            <div id="settingsBox" class="hidden bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 p-6 sm:p-8 shadow-xs space-y-6 transition-colors">
+                <div class="border-b border-slate-100 dark:border-slate-700/80 pb-4">
+                    <h2 class="text-base font-bold text-slate-900 dark:text-white">Orientation Controls</h2>
+                </div>
+
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <button type="button" id="btnRotateLeft" class="p-3.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-purple-50 dark:hover:bg-purple-950/40 hover:border-purple-300 text-slate-800 dark:text-slate-200 text-xs font-bold flex flex-col items-center gap-2 transition">
+                        <i class="fa-solid fa-rotate-left text-lg text-purple-600 dark:text-purple-400"></i>
+                        <span>Rotate 90Â° Left</span>
+                    </button>
+                    <button type="button" id="btnRotateRight" class="p-3.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-purple-50 dark:hover:bg-purple-950/40 hover:border-purple-300 text-slate-800 dark:text-slate-200 text-xs font-bold flex flex-col items-center gap-2 transition">
+                        <i class="fa-solid fa-rotate-right text-lg text-purple-600 dark:text-purple-400"></i>
+                        <span>Rotate 90Â° Right</span>
+                    </button>
+                    <button type="button" id="btnFlipH" class="p-3.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-purple-50 dark:hover:bg-purple-950/40 hover:border-purple-300 text-slate-800 dark:text-slate-200 text-xs font-bold flex flex-col items-center gap-2 transition">
+                        <i class="fa-solid fa-arrows-left-right text-lg text-purple-600 dark:text-purple-400"></i>
+                        <span>Flip Horizontal</span>
+                    </button>
+                    <button type="button" id="btnFlipV" class="p-3.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-purple-50 dark:hover:bg-purple-950/40 hover:border-purple-300 text-slate-800 dark:text-slate-200 text-xs font-bold flex flex-col items-center gap-2 transition">
+                        <i class="fa-solid fa-arrows-up-down text-lg text-purple-600 dark:text-purple-400"></i>
+                        <span>Flip Vertical</span>
+                    </button>
+                </div>
+
+                <div class="text-xs text-center font-semibold text-slate-500 dark:text-slate-400" id="currentAngleText">
+                    Current Angle: 0Â° | Horizontal Flip: Off | Vertical Flip: Off
+                </div>
+
+                <div class="pt-2 flex flex-wrap gap-3">
+                    <button type="button" id="processBtn" class="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-sm shadow-md shadow-purple-200 dark:shadow-none transition">
+                        <i class="fa-solid fa-check"></i>
+                        <span>Save & Export Image</span>
+                    </button>
+                    <button type="button" id="resetBtn" class="px-5 py-3.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-sm transition">
+                        Reset
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="resultContainer" class="hidden bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 p-8 shadow-sm text-center transition-colors">
+            <div class="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto mb-4 text-2xl shadow-2xs">
+                <i class="fa-solid fa-check"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-1">Image Rotated Successfully!</h2>
+            <p class="text-slate-500 dark:text-slate-400 text-sm mb-6">Your newly oriented image is ready for download.</p>
+
+            <div class="max-w-md mx-auto mb-8 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700 p-2 bg-checkered">
+                <img id="resultImagePreview" src="#" alt="Rotated Image" class="max-h-64 mx-auto object-contain rounded-xl">
+            </div>
+
+            <div class="flex flex-wrap items-center justify-center gap-3">
+                <button type="button" id="downloadBtn" class="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-sm shadow-md shadow-purple-200 dark:shadow-none transition">
+                    <i class="fa-solid fa-download"></i>
+                    <span>Download Image</span>
+                </button>
+                <button type="button" id="processAnotherBtn" class="px-5 py-3.5 rounded-xl border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-sm transition">
+                    Rotate Another Image
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-6 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500 dark:text-slate-400">
+            &copy; 2026 FileGenius &bull; In-Browser Image Rotate
+        </div>
+    </footer>
+
+    <script src="../../assets/js/utils.js"></script>
+    <script src="../../assets/js/navigation.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const fileInput = document.getElementById('fileInput');
+            const dropZone = document.getElementById('dropZone');
+            const uploadPrompt = document.getElementById('uploadPrompt');
+            const previewZone = document.getElementById('previewZone');
+            const sourceImagePreview = document.getElementById('sourceImagePreview');
+            const fileMetaText = document.getElementById('fileMetaText');
+            const changeFileBtn = document.getElementById('changeFileBtn');
+            const settingsBox = document.getElementById('settingsBox');
+            const currentAngleText = document.getElementById('currentAngleText');
+
+            const btnRotateLeft = document.getElementById('btnRotateLeft');
+            const btnRotateRight = document.getElementById('btnRotateRight');
+            const btnFlipH = document.getElementById('btnFlipH');
+            const btnFlipV = document.getElementById('btnFlipV');
+
+            const processBtn = document.getElementById('processBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const toolFormContainer = document.getElementById('toolFormContainer');
+            const resultContainer = document.getElementById('resultContainer');
+            const resultImagePreview = document.getElementById('resultImagePreview');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const processAnotherBtn = document.getElementById('processAnotherBtn');
+            const errorAlert = document.getElementById('errorAlert');
+            const errorMessage = document.getElementById('errorMessage');
+
+            let currentFile = null;
+            let loadedImage = null;
+            let rotatedBlob = null;
+            let downloadFileName = 'rotated.jpg';
+
+            let rotationAngle = 0; // 0, 90, 180, 270
+            let flipH = false;
+            let flipV = false;
+
+            function showError(msg) {
+                errorMessage.textContent = msg;
+                errorAlert.classList.remove('hidden');
+            }
+            function hideError() {
+                errorAlert.classList.add('hidden');
+            }
+
+            FileGenius.Utils.setupDropzone(dropZone, fileInput, (files) => {
+                if (files && files[0]) handleFile(files[0]);
+            });
+
+            changeFileBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                fileInput.click();
+            });
+
+            async function handleFile(file) {
+                hideError();
+                currentFile = file;
+
+                try {
+                    const img = await FileGenius.Utils.loadImage(file);
+                    loadedImage = img;
+                    sourceImagePreview.src = img.src;
+                    fileMetaText.textContent = `${file.name} (${FileGenius.Utils.formatBytes(file.size)})`;
+
+                    rotationAngle = 0;
+                    flipH = false;
+                    flipV = false;
+                    updatePreviewTransform();
+
+                    uploadPrompt.classList.add('hidden');
+                    previewZone.classList.remove('hidden');
+                    settingsBox.classList.remove('hidden');
+                } catch (err) {
+                    showError('Failed to load image.');
+                }
+            }
+
+            function updatePreviewTransform() {
+                const scaleX = flipH ? -1 : 1;
+                const scaleY = flipV ? -1 : 1;
+                sourceImagePreview.style.transform = `rotate(${rotationAngle}deg) scale(${scaleX}, ${scaleY})`;
+                currentAngleText.textContent = `Current Angle: ${rotationAngle}Â° | Horizontal Flip: ${flipH ? 'On' : 'Off'} | Vertical Flip: ${flipV ? 'On' : 'Off'}`;
+            }
+
+            btnRotateLeft.addEventListener('click', () => {
+                rotationAngle = (rotationAngle - 90 + 360) % 360;
+                updatePreviewTransform();
+            });
+
+            btnRotateRight.addEventListener('click', () => {
+                rotationAngle = (rotationAngle + 90) % 360;
+                updatePreviewTransform();
+            });
+
+            btnFlipH.addEventListener('click', () => {
+                flipH = !flipH;
+                updatePreviewTransform();
+            });
+
+            btnFlipV.addEventListener('click', () => {
+                flipV = !flipV;
+                updatePreviewTransform();
+            });
+
+            processBtn.addEventListener('click', () => {
+                if (!loadedImage) return;
+
+                const nw = loadedImage.naturalWidth;
+                const nh = loadedImage.naturalHeight;
+
+                const isSideways = (rotationAngle === 90 || rotationAngle === 270);
+                const cw = isSideways ? nh : nw;
+                const ch = isSideways ? nw : nh;
+
+                const canvas = document.createElement('canvas');
+                canvas.width = cw;
+                canvas.height = ch;
+                const ctx = canvas.getContext('2d');
+                ctx.imageSmoothingEnabled = true;
+                ctx.imageSmoothingQuality = 'high';
+
+                // Move origin to center of canvas
+                ctx.translate(cw / 2, ch / 2);
+                ctx.rotate((rotationAngle * Math.PI) / 180);
+                ctx.scale(flipH ? -1 : 1, flipV ? -1 : 1);
+                ctx.drawImage(loadedImage, -nw / 2, -nh / 2);
+
+                const mime = currentFile.type || 'image/jpeg';
+                canvas.toBlob((blob) => {
+                    if (!blob) {
+                        showError('Failed to generate output image.');
+                        return;
+                    }
+                    rotatedBlob = blob;
+                    const ext = mime === 'image/png' ? '.png' : (mime === 'image/webp' ? '.webp' : '.jpg');
+                    const base = currentFile.name.replace(/\.[^.]+$/, '');
+                    downloadFileName = `${base}_rotated_${rotationAngle}deg${ext}`;
+
+                    resultImagePreview.src = URL.createObjectURL(blob);
+                    toolFormContainer.classList.add('hidden');
+                    resultContainer.classList.remove('hidden');
+                }, mime, 0.95);
+            });
+
+            downloadBtn.addEventListener('click', () => {
+                if (rotatedBlob) FileGenius.Utils.downloadBlob(rotatedBlob, downloadFileName);
+            });
+
+            function resetAll() {
+                currentFile = null;
+                loadedImage = null;
+                rotatedBlob = null;
+                rotationAngle = 0;
+                flipH = false;
+                flipV = false;
+                fileInput.value = '';
+                sourceImagePreview.src = '#';
+                sourceImagePreview.style.transform = 'none';
+                resultImagePreview.src = '#';
+                uploadPrompt.classList.remove('hidden');
+                previewZone.classList.add('hidden');
+                settingsBox.classList.add('hidden');
+                resultContainer.classList.add('hidden');
+                toolFormContainer.classList.remove('hidden');
+                hideError();
+            }
+
+            resetBtn.addEventListener('click', resetAll);
+            processAnotherBtn.addEventListener('click', resetAll);
+        });
+    </script>
+</body>
+</html>
+
+

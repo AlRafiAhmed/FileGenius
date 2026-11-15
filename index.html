@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FileGenius - Browser-Based File Utility Platform</title>
+    <meta name="description" content="Resize images, edit PDFs, convert documents, and manage files — all directly in your browser with 100% privacy and zero server uploads.">
+
+    <!-- Tailwind, FontAwesome & Local Styles -->
+    <script src="assets/libraries/tailwind.js"></script>
+    <link rel="stylesheet" href="assets/libraries/font-awesome.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <script src="assets/js/theme.js"></script>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 font-sans antialiased min-h-screen flex flex-col transition-colors duration-200">
+
+    <!-- Top Navigation Header -->
+    <header class="sticky top-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <!-- Brand Logo -->
+            <a href="index.html" class="flex items-center gap-2.5 group">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center text-white shadow-md shadow-indigo-200 dark:shadow-none group-hover:scale-105 transition-transform">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                </div>
+                <span class="text-xl font-bold text-slate-900 dark:text-white">File<span class="text-indigo-600 dark:text-indigo-400">Genius</span></span>
+            </a>
+
+            <!-- Desktop Navigation Links -->
+            <nav class="hidden md:flex items-center gap-6">
+                <a href="#tools" class="text-sm font-semibold text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 transition">All Tools</a>
+                <a href="#image-section" class="text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition">Image Tools</a>
+                <a href="#pdf-section" class="text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition">PDF Tools</a>
+                <a href="#file-section" class="text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition">File Tools</a>
+            </nav>
+
+            <!-- Right Controls: Quick Search + Quick Theme + Three-Dot Settings Menu + Mobile Menu Toggle -->
+            <div class="flex items-center gap-2 sm:gap-3">
+                <!-- Header Quick Search Box (Desktop) -->
+                <div class="hidden lg:block relative w-48 xl:w-60">
+                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                        <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                    </span>
+                    <input type="text" id="toolSearchInput" placeholder="Search 29 tools... ( / )" class="w-full pl-8 pr-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 text-xs font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 border border-transparent dark:border-slate-700 transition">
+                </div>
+
+                <!-- Quick Theme Toggle Button -->
+                <button type="button" id="quickThemeToggleBtn" class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-amber-400 flex items-center justify-center transition shadow-2xs focus:outline-none" title="Toggle Light / Dark Theme">
+                    <i class="fa-solid fa-moon dark:hidden text-sm"></i>
+                    <i class="fa-solid fa-sun hidden dark:inline text-sm"></i>
+                </button>
+
+                <!-- Contact Option -->
+                <a href="contact.html" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 transition" title="Contact Administrator">
+                    <i class="fa-solid fa-envelope text-indigo-500"></i>
+                    <span class="hidden sm:inline">Contact</span>
+                </a>
+
+                <!-- Mobile Menu Hamburger -->
+                <button type="button" id="mobileNavBtn" aria-label="Toggle Navigation Menu" class="md:hidden w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 flex items-center justify-center transition">
+                    <i class="fa-solid fa-bars text-sm"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Drawer -->
+        <div id="mobileNavDrawer" class="hidden md:hidden border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 pt-3 pb-4 space-y-2">
+            <a href="#tools" class="block px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">All Tools (29)</a>
+            <a href="#image-section" class="block px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">Image Tools (10)</a>
+            <a href="#pdf-section" class="block px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">PDF Tools (11)</a>
+            <a href="#file-section" class="block px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">File & Data Tools (8)</a>
+            <div class="pt-2 border-t border-slate-100 dark:border-slate-800">
+                <a href="contact.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/40">
+                    <i class="fa-solid fa-headset"></i> Contact Administrator
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-grow w-full">
+        <!-- Hero Section -->
+        <section class="relative overflow-hidden bg-gradient-to-b from-indigo-50/70 via-white to-slate-50 dark:from-slate-900 dark:via-slate-900 dark:to-slate-900 border-b border-slate-200 dark:border-slate-800 py-16 sm:py-24">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+                <!-- Badge -->
+                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 text-xs font-semibold mb-6 border border-indigo-100 dark:border-indigo-900/60 shadow-2xs">
+                    <i class="fa-solid fa-shield-halved text-emerald-500"></i>
+                    <span>100% Client-Side Processing &bull; No Server Uploads &bull; Completely Private</span>
+                </div>
+
+                <!-- Headline -->
+                <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 dark:text-white tracking-tight max-w-4xl mx-auto leading-tight">
+                    Everything You Need to <span class="bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 bg-clip-text text-transparent">Manage Your Files</span>
+                </h1>
+
+                <!-- Description -->
+                <p class="mt-5 text-base sm:text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto leading-relaxed">
+                    Resize images, edit PDFs, convert documents, and manage files — all directly in your browser.
+                </p>
+
+                <!-- Prominent Search Box -->
+                <div class="mt-8 max-w-2xl mx-auto">
+                    <div class="relative shadow-lg shadow-indigo-100 dark:shadow-none rounded-2xl">
+                        <span class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 text-lg">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </span>
+                        <input type="text" id="heroSearchInput" placeholder="Search 29 file tools (e.g. compress pdf, resize image, csv to json)..." class="w-full pl-12 pr-28 py-4 rounded-2xl bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm sm:text-base font-medium placeholder-slate-400 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition">
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                            <a href="#tools" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs transition shadow-2xs">
+                                Browse Tools
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Feature Badges -->
+                <div class="mt-8 flex flex-wrap items-center justify-center gap-6 text-xs text-slate-500 dark:text-slate-400 font-medium">
+                    <div class="flex items-center gap-1.5">
+                        <i class="fa-solid fa-bolt text-amber-500"></i> Instant Browser Execution
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <i class="fa-solid fa-lock text-emerald-500"></i> Zero Cloud Storage
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <i class="fa-solid fa-user-xmark text-indigo-500"></i> No Account Needed
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <i class="fa-solid fa-infinity text-purple-500"></i> Free & Unlimited
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tools Section -->
+        <section id="tools" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full">
+            <!-- Category Filter Tabs -->
+            <div class="flex items-center justify-between flex-wrap gap-4 mb-8">
+                <div class="flex items-center gap-2 overflow-x-auto pb-2 w-full sm:w-auto" id="categoryTabs">
+                    <button type="button" data-filter="all" class="category-filter-btn px-4 py-2 rounded-xl text-xs font-bold transition bg-indigo-600 text-white shadow-xs">
+                        All Operations (29)
+                    </button>
+                    <button type="button" data-filter="image" class="category-filter-btn px-4 py-2 rounded-xl text-xs font-semibold transition bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700">
+                        Image Tools (10)
+                    </button>
+                    <button type="button" data-filter="pdf" class="category-filter-btn px-4 py-2 rounded-xl text-xs font-semibold transition bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700">
+                        PDF Tools (11)
+                    </button>
+                    <button type="button" data-filter="file" class="category-filter-btn px-4 py-2 rounded-xl text-xs font-semibold transition bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700">
+                        File & Data Tools (8)
+                    </button>
+                </div>
+                <div class="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                    <span>Showing client-side utilities</span>
+                </div>
+            </div>
+
+            <!-- Empty State / No Results Box -->
+            <div id="noResultsBox" class="hidden text-center py-16 px-4 bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 my-6 shadow-2xs">
+                <div class="w-16 h-16 rounded-2xl bg-slate-100 dark:bg-slate-700 text-slate-400 dark:text-slate-300 flex items-center justify-center mx-auto mb-3 text-2xl">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </div>
+                <h3 class="text-base font-bold text-slate-800 dark:text-slate-100 mb-1">No operations match your query</h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto mb-4">Try searching for keywords like "resize", "pdf", "crop", "compress", or "csv".</p>
+                <button type="button" onclick="document.getElementById('heroSearchInput').value=''; document.getElementById('toolSearchInput').value=''; document.querySelector('[data-filter=\'all\']').click();" class="px-4 py-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 font-semibold text-xs hover:bg-indigo-100 dark:hover:bg-indigo-900 transition">
+                    Reset Filter
+                </button>
+            </div>
+
+            <!-- CATEGORY A: IMAGE TOOLS (10) -->
+            <div id="image-section" class="tool-section mb-12" data-category="image">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-8 h-8 rounded-xl bg-blue-100 dark:bg-blue-950 text-blue-600 dark:text-blue-400 flex items-center justify-center text-sm font-bold">
+                            <i class="fa-solid fa-image"></i>
+                        </span>
+                        <h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white">Category A: Image Tools</h2>
+                        <span class="text-xxs font-bold px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-300 border border-blue-200 dark:border-blue-800">10 Tools</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+                    <!-- 1. Image Resize -->
+                    <a href="operations/image/image-resize.html" data-keywords="image resize dimension percentage scale px jpg png webp aspect ratio" class="tool-card p-4 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500 hover:shadow-md transition group">
+                        <div class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-up-right-and-down-left-from-center"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-900 dark:text-white text-sm mb-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition">Image Resize</h3>
+                        <p class="text-slate-500 dark:text-slate-400 text-xs">Resize images by custom pixels or percentage scale with aspect ratio lock.</p>
+                    </a>
+
+                    <!-- 2. Image Compress -->
+                    <a href="operations/image/image-compress.html" data-keywords="image compress reduce size shrink jpg png webp optimize" class="tool-card p-4 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500 hover:shadow-md transition group">
+                        <div class="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-compress"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-900 dark:text-white text-sm mb-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition">Image Compress</h3>
+                        <p class="text-slate-500 dark:text-slate-400 text-xs">Adjust compression quality and target size with live savings percentage.</p>
+                    </a>
+
+                    <!-- 3. Image Convert -->
+                    <a href="operations/image/image-convert.html" data-keywords="image convert webp png jpg format transparency alpha" class="tool-card p-4 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500 hover:shadow-md transition group">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-repeat"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-900 dark:text-white text-sm mb-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition">Image Convert</h3>
+                        <p class="text-slate-500 dark:text-slate-400 text-xs">Convert seamlessly between JPG, PNG, and WebP while preserving transparency.</p>
+                    </a>
+
+                    <!-- 4. Image Crop -->
+                    <a href="operations/image/image-crop.html" data-keywords="image crop cut square rectangle aspect ratio presets dimensions" class="tool-card p-4 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500 hover:shadow-md transition group">
+                        <div class="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-crop"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-900 dark:text-white text-sm mb-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition">Image Crop</h3>
+                        <p class="text-slate-500 dark:text-slate-400 text-xs">Interactive visual crop tool with aspect ratio presets and custom sizing.</p>
+                    </a>
+
+                    <!-- 5. Image Rotate -->
+                    <a href="operations/image/image-rotate.html" data-keywords="image rotate 90 180 270 flip angle mirror orientation horizontal vertical" class="tool-card p-4 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500 hover:shadow-md transition group">
+                        <div class="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-rotate"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-900 dark:text-white text-sm mb-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition">Image Rotate</h3>
+                        <p class="text-slate-500 dark:text-slate-400 text-xs">Rotate by 90°, 180°, 270° or mirror images horizontally and vertically.</p>
+                    </a>
+
+                    <!-- 6. Image Watermark -->
+                    <a href="operations/image/image-watermark.html" data-keywords="image watermark stamp text brand copyright opacity position font" class="tool-card p-4 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500 hover:shadow-md transition group">
+                        <div class="w-10 h-10 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-stamp"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-900 dark:text-white text-sm mb-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition">Image Watermark</h3>
+                        <p class="text-slate-500 dark:text-slate-400 text-xs">Add customizable text watermarks with 9-position placement and opacity controls.</p>
+                    </a>
+
+                    <!-- 7. Image Background Remove -->
+                    <a href="operations/image/image-background-remove.html" data-keywords="image background remove transparent cutout nobg flood fill eyedropper color tolerance" class="tool-card p-4 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500 hover:shadow-md transition group">
+                        <div class="w-10 h-10 rounded-xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-wand-magic"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-900 dark:text-white text-sm mb-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition">Remove Background</h3>
+                        <p class="text-slate-500 dark:text-slate-400 text-xs">Local color sampling and flood-fill transparency removal to export transparent PNG.</p>
+                    </a>
+
+                    <!-- 8. Passport Photo -->
+                    <a href="operations/image/passport-photo.html" data-keywords="passport photo 2x2 35x45 biometric id card us uk eu print grid" class="tool-card p-4 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500 hover:shadow-md transition group">
+                        <div class="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-id-card"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-900 dark:text-white text-sm mb-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition">Passport Photo</h3>
+                        <p class="text-slate-500 dark:text-slate-400 text-xs">Format US 2x2 in & UK/EU 35x45mm ID photos with single or 2x2 printable grid.</p>
+                    </a>
+
+                    <!-- 9. Bulk Image Resize -->
+                    <a href="operations/image/bulk-image-resize.html" data-keywords="bulk image resize batch zip archive multiple photos dimensions" class="tool-card p-4 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500 hover:shadow-md transition group">
+                        <div class="w-10 h-10 rounded-xl bg-violet-50 dark:bg-violet-950/60 text-violet-600 dark:text-violet-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-images"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-900 dark:text-white text-sm mb-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition">Bulk Image Resize</h3>
+                        <p class="text-slate-500 dark:text-slate-400 text-xs">Upload and resize batches of images together and download all as a ZIP file.</p>
+                    </a>
+
+                    <!-- 10. Image to PDF -->
+                    <a href="operations/image/image-to-pdf.html" data-keywords="image to pdf album photos pictures document a4 letter margins reorder" class="tool-card p-4 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500 hover:shadow-md transition group">
+                        <div class="w-10 h-10 rounded-xl bg-red-50 dark:bg-red-950/60 text-red-600 dark:text-red-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-file-image"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-900 dark:text-white text-sm mb-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition">Image to PDF</h3>
+                        <p class="text-slate-500 dark:text-slate-400 text-xs">Compile multiple pictures into a multi-page PDF document with custom margins.</p>
+                    </a>
+                </div>
+            </div>
+
+            <!-- CATEGORY B: PDF TOOLS (11) -->
+            <div id="pdf-section" class="tool-section mb-12" data-category="pdf">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-8 h-8 rounded-xl bg-rose-100 dark:bg-rose-950 text-rose-600 dark:text-rose-400 flex items-center justify-center text-sm font-bold">
+                            <i class="fa-solid fa-file-pdf"></i>
+                        </span>
+                        <h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white">Category B: PDF Tools</h2>
+                        <span class="text-xxs font-bold px-2 py-0.5 rounded-full bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-300 border border-rose-200 dark:border-rose-800">11 Tools</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+                    <!-- 11. PDF Merge -->
+                    <a href="operations/pdf/pdf-merge.html" data-keywords="pdf merge combine join attach multiple documents reorder" class="tool-card p-4 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500 hover:shadow-md transition group">
+                        <div class="w-10 h-10 rounded-xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-object-group"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-900 dark:text-white text-sm mb-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition">PDF Merge</h3>
+                        <p class="text-slate-500 dark:text-slate-400 text-xs">Combine multiple PDF files in your preferred order into one clean document.</p>
+                    </a>
+
+                    <!-- 12. PDF Split -->
+                    <a href="operations/pdf/pdf-split.html" data-keywords="pdf split extract pages ranges separate single documents" class="tool-card p-4 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500 hover:shadow-md transition group">
+                        <div class="w-10 h-10 rounded-xl bg-orange-50 dark:bg-orange-950/60 text-orange-600 dark:text-orange-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-scissors"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-900 dark:text-white text-sm mb-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition">PDF Split</h3>
+                        <p class="text-slate-500 dark:text-slate-400 text-xs">Extract individual pages or specified page ranges into separate PDFs.</p>
+                    </a>
+
+                    <!-- 13. PDF Compress -->
+                    <a href="operations/pdf/pdf-compress.html" data-keywords="pdf compress reduce size shrink document optimize streams bytes" class="tool-card p-4 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500 hover:shadow-md transition group">
+                        <div class="w-10 h-10 rounded-xl bg-red-50 dark:bg-red-950/60 text-red-600 dark:text-red-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-compress"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-900 dark:text-white text-sm mb-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition">PDF Compress</h3>
+                        <p class="text-slate-500 dark:text-slate-400 text-xs">Genuine browser-side PDF stream optimization showing actual size difference.</p>
+                    </a>
+
+                    <!-- 14. PDF Rotate -->
+                    <a href="operations/pdf/pdf-rotate.html" data-keywords="pdf rotate angle 90 180 270 portrait landscape orientation pages" class="tool-card p-4 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500 hover:shadow-md transition group">
+                        <div class="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-arrows-rotate"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-900 dark:text-white text-sm mb-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition">PDF Rotate</h3>
+                        <p class="text-slate-500 dark:text-slate-400 text-xs">Rotate individual pages or all pages by 90°, 180°, or 270° permanently.</p>
+                    </a>
+
+                    <!-- 15. PDF Reorder -->
+                    <a href="operations/pdf/pdf-reorder.html" data-keywords="pdf reorder sequence pages arrange sort drag drop thumbnails" class="tool-card p-4 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500 hover:shadow-md transition group">
+                        <div class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-arrow-down-1-9"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-900 dark:text-white text-sm mb-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition">PDF Reorder</h3>
+                        <p class="text-slate-500 dark:text-slate-400 text-xs">Visual page thumbnail preview with drag-and-drop page rearranging.</p>
+                    </a>
+
+                    <!-- 16. PDF Delete Pages -->
+                    <a href="operations/pdf/pdf-delete-pages.html" data-keywords="pdf delete remove blank pages strip select pages" class="tool-card p-4 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500 hover:shadow-md transition group">
+                        <div class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-900 dark:text-white text-sm mb-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition">PDF Delete Pages</h3>
+                        <p class="text-slate-500 dark:text-slate-400 text-xs">Select and remove unnecessary or blank pages with visual preview.</p>
+                    </a>
+
+                    <!-- 17. PDF Watermark -->
+                    <a href="operations/pdf/pdf-watermark.html" data-keywords="pdf watermark confidential security stamp text opacity color position" class="tool-card p-4 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500 hover:shadow-md transition group">
+                        <div class="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-stamp"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-900 dark:text-white text-sm mb-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition">PDF Watermark</h3>
+                        <p class="text-slate-500 dark:text-slate-400 text-xs">Stamp customized text watermarks across selected or all PDF pages.</p>
+                    </a>
+
+                    <!-- 18. PDF Extract Text -->
+                    <a href="operations/pdf/pdf-extract-text.html" data-keywords="pdf extract text parser read content copy txt download" class="tool-card p-4 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500 hover:shadow-md transition group">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-align-left"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-900 dark:text-white text-sm mb-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition">PDF Extract Text</h3>
+                        <p class="text-slate-500 dark:text-slate-400 text-xs">Extract text streams using PDF.js to read, copy, or download as TXT.</p>
+                    </a>
+
+                    <!-- 19. PDF to JPG -->
+                    <a href="operations/pdf/pdf-to-jpg.html" data-keywords="pdf to jpg render image picture pages resolution zip" class="tool-card p-4 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500 hover:shadow-md transition group">
+                        <div class="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-file-image"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-900 dark:text-white text-sm mb-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition">PDF to JPG</h3>
+                        <p class="text-slate-500 dark:text-slate-400 text-xs">Render PDF pages to high-resolution JPG images and export as individual files or ZIP.</p>
+                    </a>
+
+                    <!-- 20. JPG to PDF -->
+                    <a href="operations/pdf/jpg-to-pdf.html" data-keywords="jpg to pdf convert photo images document a4 letter margins" class="tool-card p-4 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500 hover:shadow-md transition group">
+                        <div class="w-10 h-10 rounded-xl bg-pink-50 dark:bg-pink-950/60 text-pink-600 dark:text-pink-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-file-pdf"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-900 dark:text-white text-sm mb-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition">JPG to PDF</h3>
+                        <p class="text-slate-500 dark:text-slate-400 text-xs">Convert multiple JPG pictures into a formatted PDF document.</p>
+                    </a>
+
+                    <!-- 21. Word to PDF -->
+                    <a href="operations/pdf/word-to-pdf.html" data-keywords="word to pdf docx microsoft office document convert" class="tool-card p-4 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500 hover:shadow-md transition group">
+                        <div class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-file-word"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-900 dark:text-white text-sm mb-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition">Word to PDF</h3>
+                        <p class="text-slate-500 dark:text-slate-400 text-xs">Browser-based DOCX document structure parser and clean PDF generator.</p>
+                    </a>
+                </div>
+            </div>
+
+            <!-- CATEGORY C: FILE AND DATA TOOLS (8) -->
+            <div id="file-section" class="tool-section mb-12" data-category="file">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-8 h-8 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-sm font-bold">
+                            <i class="fa-solid fa-folder-tree"></i>
+                        </span>
+                        <h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white">Category C: File & Data Tools</h2>
+                        <span class="text-xxs font-bold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">8 Tools</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- 22. File ZIP -->
+                    <a href="operations/file/file-zip.html" data-keywords="file zip archive compress package bundle files multiple" class="tool-card p-4 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500 hover:shadow-md transition group">
+                        <div class="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-file-zipper"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-900 dark:text-white text-sm mb-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition">File ZIP</h3>
+                        <p class="text-slate-500 dark:text-slate-400 text-xs">Bundle multiple files into a compressed ZIP archive in memory.</p>
+                    </a>
+
+                    <!-- 23. File Unzip -->
+                    <a href="operations/file/file-unzip.html" data-keywords="file unzip extract unpack open zip security safe traversal" class="tool-card p-4 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500 hover:shadow-md transition group">
+                        <div class="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-box-open"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-900 dark:text-white text-sm mb-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition">File Unzip</h3>
+                        <p class="text-slate-500 dark:text-slate-400 text-xs">Safely inspect and extract ZIP files with traversal protection.</p>
+                    </a>
+
+                    <!-- 24. File Size Checker -->
+                    <a href="operations/file/file-size-checker.html" data-keywords="file size checker hash checksum md5 sha256 bytes kb mb gb integrity" class="tool-card p-4 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500 hover:shadow-md transition group">
+                        <div class="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-chart-simple"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-900 dark:text-white text-sm mb-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition">File Size Checker</h3>
+                        <p class="text-slate-500 dark:text-slate-400 text-xs">Calculate exact bytes, KB, MB, GB, and compute SHA-256 and MD5 checksums.</p>
+                    </a>
+
+                    <!-- 25. CSV to JSON -->
+                    <a href="operations/file/csv-to-json.html" data-keywords="csv to json spreadsheet tabular convert parse quotes delimiter" class="tool-card p-4 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500 hover:shadow-md transition group">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-table-cells"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-900 dark:text-white text-sm mb-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition">CSV to JSON</h3>
+                        <p class="text-slate-500 dark:text-slate-400 text-xs">Parse CSV tables and quoted strings into clean structured JSON objects.</p>
+                    </a>
+
+                    <!-- 26. JSON to CSV -->
+                    <a href="operations/file/json-to-csv.html" data-keywords="json to csv flatten spreadsheet table export excel array" class="tool-card p-4 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500 hover:shadow-md transition group">
+                        <div class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-code"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-900 dark:text-white text-sm mb-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition">JSON to CSV</h3>
+                        <p class="text-slate-500 dark:text-slate-400 text-xs">Convert JSON arrays and nested object properties into standard CSV rows.</p>
+                    </a>
+
+                    <!-- 27. TXT to PDF -->
+                    <a href="operations/file/txt-to-pdf.html" data-keywords="txt to pdf text document convert compile pagination font size" class="tool-card p-4 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500 hover:shadow-md transition group">
+                        <div class="w-10 h-10 rounded-xl bg-violet-50 dark:bg-violet-950/60 text-violet-600 dark:text-violet-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-file-lines"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-900 dark:text-white text-sm mb-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition">TXT to PDF</h3>
+                        <p class="text-slate-500 dark:text-slate-400 text-xs">Compile plain text notes into paginated PDF pages with font size options.</p>
+                    </a>
+
+                    <!-- 28. Markdown to HTML -->
+                    <a href="operations/file/markdown-to-html.html" data-keywords="markdown to html md web page webdoc sanitize xss marked" class="tool-card p-4 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500 hover:shadow-md transition group">
+                        <div class="w-10 h-10 rounded-xl bg-orange-50 dark:bg-orange-950/60 text-orange-600 dark:text-orange-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                            <i class="fa-brands fa-markdown"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-900 dark:text-white text-sm mb-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition">Markdown to HTML</h3>
+                        <p class="text-slate-500 dark:text-slate-400 text-xs">Convert Markdown with full sanitization, live HTML preview, and code download.</p>
+                    </a>
+
+                    <!-- 29. Markdown to PDF -->
+                    <a href="operations/file/markdown-to-pdf.html" data-keywords="markdown to pdf md notes docs compile headings tables lists code" class="tool-card p-4 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500 hover:shadow-md transition group">
+                        <div class="w-10 h-10 rounded-xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-file-contract"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-900 dark:text-white text-sm mb-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition">Markdown to PDF</h3>
+                        <p class="text-slate-500 dark:text-slate-400 text-xs">Transform formatted Markdown notes into styled PDF documents with clean page breaks.</p>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Privacy & Security Guarantee Banner -->
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 w-full">
+            <div class="bg-gradient-to-r from-indigo-900 via-indigo-950 to-slate-900 rounded-3xl p-8 sm:p-10 text-white shadow-xl relative overflow-hidden border border-indigo-800/40">
+                <div class="relative z-10 max-w-2xl">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-semibold mb-3 border border-emerald-500/30">
+                        <i class="fa-solid fa-lock"></i> Architecture Guarantee
+                    </div>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight">Your Files Never Leave Your Browser</h2>
+                    <p class="mt-2 text-indigo-200 text-sm leading-relaxed">
+                        Unlike traditional converters that upload your confidential documents to external cloud servers, FileGenius runs all calculations directly on your device using WebAssembly, HTML5 Canvas, and modern Web APIs.
+                    </p>
+                    <div class="mt-6 flex flex-wrap items-center gap-4 text-xs font-semibold">
+                        <span class="flex items-center gap-1.5 text-emerald-400"><i class="fa-solid fa-circle-check"></i> Zero Server Uploads</span>
+                        <span class="flex items-center gap-1.5 text-emerald-400"><i class="fa-solid fa-circle-check"></i> No Accounts or Tracking</span>
+                        <span class="flex items-center gap-1.5 text-emerald-400"><i class="fa-solid fa-circle-check"></i> Works Fully Offline</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-12 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                <!-- Branding -->
+                <div class="md:col-span-1">
+                    <a href="index.html" class="flex items-center gap-2.5 mb-3">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center text-white text-sm shadow-xs">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        </div>
+                        <span class="text-lg font-bold text-slate-900 dark:text-white">File<span class="text-indigo-600 dark:text-indigo-400">Genius</span></span>
+                    </a>
+                    <p class="text-slate-500 dark:text-slate-400 text-xs leading-relaxed">
+                        Modern, privacy-first, browser-based file manipulation platform. Resize, compress, edit, and convert with zero server uploads.
+                    </p>
+                </div>
+
+                <!-- Category Links: Image -->
+                <div>
+                    <h3 class="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider mb-3">Image Tools</h3>
+                    <ul class="space-y-2 text-xs text-slate-600 dark:text-slate-400">
+                        <li><a href="operations/image/image-resize.html" class="hover:text-indigo-600 dark:hover:text-indigo-400 transition">Image Resize</a></li>
+                        <li><a href="operations/image/image-compress.html" class="hover:text-indigo-600 dark:hover:text-indigo-400 transition">Image Compress</a></li>
+                        <li><a href="operations/image/image-convert.html" class="hover:text-indigo-600 dark:hover:text-indigo-400 transition">Image Convert</a></li>
+                        <li><a href="operations/image/image-crop.html" class="hover:text-indigo-600 dark:hover:text-indigo-400 transition">Image Crop</a></li>
+                        <li><a href="operations/image/image-to-pdf.html" class="hover:text-indigo-600 dark:hover:text-indigo-400 transition">Image to PDF</a></li>
+                    </ul>
+                </div>
+
+                <!-- Category Links: PDF -->
+                <div>
+                    <h3 class="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider mb-3">PDF Tools</h3>
+                    <ul class="space-y-2 text-xs text-slate-600 dark:text-slate-400">
+                        <li><a href="operations/pdf/pdf-merge.html" class="hover:text-indigo-600 dark:hover:text-indigo-400 transition">PDF Merge</a></li>
+                        <li><a href="operations/pdf/pdf-split.html" class="hover:text-indigo-600 dark:hover:text-indigo-400 transition">PDF Split</a></li>
+                        <li><a href="operations/pdf/pdf-compress.html" class="hover:text-indigo-600 dark:hover:text-indigo-400 transition">PDF Compress</a></li>
+                        <li><a href="operations/pdf/pdf-extract-text.html" class="hover:text-indigo-600 dark:hover:text-indigo-400 transition">Extract Text</a></li>
+                        <li><a href="operations/pdf/word-to-pdf.html" class="hover:text-indigo-600 dark:hover:text-indigo-400 transition">Word to PDF</a></li>
+                    </ul>
+                </div>
+
+                <!-- File Tools & Contact -->
+                <div>
+                    <h3 class="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider mb-3">File & Support</h3>
+                    <ul class="space-y-2 text-xs text-slate-600 dark:text-slate-400">
+                        <li><a href="operations/file/file-zip.html" class="hover:text-indigo-600 dark:hover:text-indigo-400 transition">File ZIP</a></li>
+                        <li><a href="operations/file/file-size-checker.html" class="hover:text-indigo-600 dark:hover:text-indigo-400 transition">File Size Checker</a></li>
+                        <li><a href="operations/file/csv-to-json.html" class="hover:text-indigo-600 dark:hover:text-indigo-400 transition">CSV to JSON</a></li>
+                        <li><a href="operations/file/markdown-to-pdf.html" class="hover:text-indigo-600 dark:hover:text-indigo-400 transition">Markdown to PDF</a></li>
+                        <li><a href="contact.html" class="hover:text-indigo-600 dark:hover:text-indigo-400 font-semibold text-indigo-600 dark:text-indigo-400 transition">Contact Administrator</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Bottom Copyright -->
+            <div class="border-t border-slate-100 dark:border-slate-800 pt-6 text-center text-xs text-slate-500 dark:text-slate-400">
+                &copy; 2026 FileGenius. Built with modern Web APIs &amp; local in-browser processing. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="assets/js/navigation.js"></script>
+    <script src="assets/js/search.js"></script>
+    <script src="assets/js/app.js"></script>
+</body>
+</html>
+

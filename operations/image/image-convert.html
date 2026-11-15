@@ -1,0 +1,347 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Convert Image - FileGenius</title>
+    <meta name="description" content="Convert images between JPG, PNG, and WebP directly in your browser with full alpha transparency support.">
+
+    <script src="../../assets/libraries/tailwind.js"></script>
+    <link rel="stylesheet" href="../../assets/libraries/font-awesome.min.css">
+    <link rel="stylesheet" href="../../assets/css/style.css">
+    <script src="../../assets/js/theme.js"></script>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 font-sans antialiased min-h-screen flex flex-col transition-colors duration-200">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <a href="../../index.html" class="flex items-center gap-2.5 group">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center text-white shadow-md shadow-indigo-200 dark:shadow-none group-hover:scale-105 transition-transform">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                </div>
+                <span class="text-xl font-bold text-slate-900 dark:text-white">File<span class="text-indigo-600 dark:text-indigo-400">Genius</span></span>
+            </a>
+
+            <div class="flex items-center gap-3">
+                <a href="../../index.html#image-section" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span class="hidden sm:inline">Back to Tools</span>
+                </a>
+
+                <button type="button" id="quickThemeToggleBtn" class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-amber-400 flex items-center justify-center transition shadow-2xs focus:outline-none" title="Toggle Light / Dark Theme">
+                    <i class="fa-solid fa-moon dark:hidden text-sm"></i>
+                    <i class="fa-solid fa-sun hidden dark:inline text-sm"></i>
+                </button>
+
+                                <a href="../../contact.html" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 transition" title="Contact Administrator">
+                    <i class="fa-solid fa-envelope text-indigo-500"></i>
+                    <span class="hidden sm:inline">Contact</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-grow max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 text-xs font-semibold mb-3 border border-emerald-100 dark:border-emerald-900">
+                <i class="fa-solid fa-repeat"></i> Image Format Converter
+            </div>
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white mb-2">Convert Image Format</h1>
+            <p class="text-slate-600 dark:text-slate-400 text-sm max-w-xl mx-auto">
+                Convert between JPG, PNG, and modern WebP formats in seconds with transparency preserved.
+            </p>
+        </div>
+
+        <div id="errorAlert" class="hidden mb-6 p-4 rounded-2xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-sm flex items-center gap-3">
+            <i class="fa-solid fa-circle-exclamation flex-shrink-0 text-base"></i>
+            <span id="errorMessage"></span>
+        </div>
+
+        <div id="toolFormContainer" class="space-y-6">
+            <!-- Dropzone -->
+            <div id="dropZone" class="relative border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-indigo-500 rounded-3xl p-8 sm:p-12 text-center bg-white dark:bg-slate-800 transition cursor-pointer group shadow-2xs">
+                <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp,image/svg+xml,image/bmp,image/gif" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                
+                <div id="uploadPrompt" class="space-y-3">
+                    <div class="w-16 h-16 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto text-2xl group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                    </div>
+                    <div>
+                        <span class="text-base font-bold text-slate-800 dark:text-slate-200">Choose an image to convert</span>
+                        <span class="text-sm text-slate-500 dark:text-slate-400"> or drag and drop it here</span>
+                    </div>
+                    <p class="text-xs text-slate-400">Supports JPG, PNG, WebP, GIF, SVG, BMP &bull; 100% In-Browser</p>
+                </div>
+
+                <div id="previewZone" class="hidden space-y-3">
+                    <div class="max-h-64 mx-auto rounded-xl overflow-hidden inline-block border border-slate-200 dark:border-slate-700 bg-checkered p-1">
+                        <img id="sourceImagePreview" src="#" alt="Loaded Preview" class="max-h-60 mx-auto object-contain rounded-lg">
+                    </div>
+                    <div class="text-xs font-semibold text-slate-600 dark:text-slate-300" id="fileMetaText"></div>
+                    <button type="button" id="changeFileBtn" class="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline">Choose a different image</button>
+                </div>
+            </div>
+
+            <!-- Settings Box -->
+            <div id="settingsBox" class="hidden bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 p-6 sm:p-8 shadow-xs space-y-6 transition-colors">
+                <div class="border-b border-slate-100 dark:border-slate-700/80 pb-4">
+                    <h2 class="text-base font-bold text-slate-900 dark:text-white">Target Output Format</h2>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <label class="cursor-pointer border-2 border-emerald-500 rounded-2xl p-4 flex flex-col items-center justify-center text-center bg-emerald-50/50 dark:bg-emerald-950/30 transition has-[:checked]:border-emerald-600 has-[:checked]:bg-emerald-50/70" id="optPng">
+                        <input type="radio" name="targetFormat" value="image/png" checked class="sr-only">
+                        <span class="font-bold text-sm text-slate-900 dark:text-white">PNG</span>
+                        <span class="text-xxs text-slate-500 dark:text-slate-400 mt-1">Lossless with Transparency</span>
+                    </label>
+
+                    <label class="cursor-pointer border border-slate-200 dark:border-slate-700 rounded-2xl p-4 flex flex-col items-center justify-center text-center hover:bg-slate-50 dark:hover:bg-slate-700 transition" id="optJpg">
+                        <input type="radio" name="targetFormat" value="image/jpeg" class="sr-only">
+                        <span class="font-bold text-sm text-slate-900 dark:text-white">JPG / JPEG</span>
+                        <span class="text-xxs text-slate-500 dark:text-slate-400 mt-1">Best for photos & small files</span>
+                    </label>
+
+                    <label class="cursor-pointer border border-slate-200 dark:border-slate-700 rounded-2xl p-4 flex flex-col items-center justify-center text-center hover:bg-slate-50 dark:hover:bg-slate-700 transition" id="optWebp">
+                        <input type="radio" name="targetFormat" value="image/webp" class="sr-only">
+                        <span class="font-bold text-sm text-slate-900 dark:text-white">WebP</span>
+                        <span class="text-xxs text-slate-500 dark:text-slate-400 mt-1">Modern high-efficiency format</span>
+                    </label>
+                </div>
+
+                <!-- JPEG Quality Slider (Visible only if JPEG chosen) -->
+                <div id="jpgQualityBox" class="hidden space-y-2 pt-2 border-t border-slate-100 dark:border-slate-700/80">
+                    <div class="flex justify-between items-center text-xs font-bold text-slate-700 dark:text-slate-300">
+                        <span>JPEG Quality:</span>
+                        <span id="jpgQualityVal">92%</span>
+                    </div>
+                    <input type="range" id="jpgQualitySlider" min="10" max="100" value="92" class="w-full accent-emerald-500">
+                </div>
+
+                <div class="pt-2 flex flex-wrap gap-3">
+                    <button type="button" id="processBtn" class="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-md shadow-emerald-200 dark:shadow-none transition">
+                        <i class="fa-solid fa-repeat"></i>
+                        <span>Convert Image Now</span>
+                    </button>
+                    <button type="button" id="resetBtn" class="px-5 py-3.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-sm transition">
+                        Reset
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Output / Result Card -->
+        <div id="resultContainer" class="hidden bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 p-8 shadow-sm text-center transition-colors">
+            <div class="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto mb-4 text-2xl shadow-2xs">
+                <i class="fa-solid fa-check"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-1">Image Converted Successfully!</h2>
+            <p class="text-slate-500 dark:text-slate-400 text-sm mb-6">Converted to target format with zero server uploads.</p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg mx-auto mb-8 text-left">
+                <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-700/60">
+                    <span class="text-xs font-bold text-slate-400 uppercase">Input Format</span>
+                    <div id="resOrigFormat" class="text-lg font-bold text-slate-800 dark:text-slate-200 mt-1">JPG</div>
+                    <div id="resOrigSize" class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">0 KB</div>
+                </div>
+                <div class="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800">
+                    <span class="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase">Output Format</span>
+                    <div id="resNewFormat" class="text-lg font-bold text-emerald-950 dark:text-emerald-200 mt-1">PNG</div>
+                    <div id="resNewSize" class="text-xs text-emerald-700 dark:text-emerald-300 mt-0.5">0 KB</div>
+                </div>
+            </div>
+
+            <div class="max-w-md mx-auto mb-8 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700 p-2 bg-checkered">
+                <img id="resultImagePreview" src="#" alt="Converted Image" class="max-h-64 mx-auto object-contain rounded-xl">
+            </div>
+
+            <div class="flex flex-wrap items-center justify-center gap-3">
+                <button type="button" id="downloadBtn" class="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-md shadow-emerald-200 dark:shadow-none transition">
+                    <i class="fa-solid fa-download"></i>
+                    <span>Download Converted Image</span>
+                </button>
+                <button type="button" id="processAnotherBtn" class="px-5 py-3.5 rounded-xl border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-sm transition">
+                    Convert Another Image
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-6 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500 dark:text-slate-400">
+            &copy; 2026 FileGenius &bull; In-Browser Image Format Converter
+        </div>
+    </footer>
+
+    <script src="../../assets/js/utils.js"></script>
+    <script src="../../assets/js/navigation.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const fileInput = document.getElementById('fileInput');
+            const dropZone = document.getElementById('dropZone');
+            const uploadPrompt = document.getElementById('uploadPrompt');
+            const previewZone = document.getElementById('previewZone');
+            const sourceImagePreview = document.getElementById('sourceImagePreview');
+            const fileMetaText = document.getElementById('fileMetaText');
+            const changeFileBtn = document.getElementById('changeFileBtn');
+            const settingsBox = document.getElementById('settingsBox');
+            const errorAlert = document.getElementById('errorAlert');
+            const errorMessage = document.getElementById('errorMessage');
+
+            const radioOpts = document.querySelectorAll('input[name="targetFormat"]');
+            const jpgQualityBox = document.getElementById('jpgQualityBox');
+            const jpgQualitySlider = document.getElementById('jpgQualitySlider');
+            const jpgQualityVal = document.getElementById('jpgQualityVal');
+
+            const processBtn = document.getElementById('processBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const toolFormContainer = document.getElementById('toolFormContainer');
+            const resultContainer = document.getElementById('resultContainer');
+            const resultImagePreview = document.getElementById('resultImagePreview');
+            const resOrigFormat = document.getElementById('resOrigFormat');
+            const resOrigSize = document.getElementById('resOrigSize');
+            const resNewFormat = document.getElementById('resNewFormat');
+            const resNewSize = document.getElementById('resNewSize');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const processAnotherBtn = document.getElementById('processAnotherBtn');
+
+            let currentFile = null;
+            let loadedImage = null;
+            let convertedBlob = null;
+            let downloadFileName = 'converted.png';
+
+            function showError(msg) {
+                errorMessage.textContent = msg;
+                errorAlert.classList.remove('hidden');
+            }
+            function hideError() {
+                errorAlert.classList.add('hidden');
+            }
+
+            FileGenius.Utils.setupDropzone(dropZone, fileInput, (files) => {
+                if (files && files[0]) handleFile(files[0]);
+            });
+
+            changeFileBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                fileInput.click();
+            });
+
+            async function handleFile(file) {
+                hideError();
+                currentFile = file;
+
+                try {
+                    const img = await FileGenius.Utils.loadImage(file);
+                    loadedImage = img;
+                    sourceImagePreview.src = img.src;
+                    fileMetaText.textContent = `${file.name} (${FileGenius.Utils.formatBytes(file.size)})`;
+
+                    uploadPrompt.classList.add('hidden');
+                    previewZone.classList.remove('hidden');
+                    settingsBox.classList.remove('hidden');
+                } catch (err) {
+                    showError('Failed to load image format. Please upload a standard image file.');
+                }
+            }
+
+            // Radio format selection styling
+            radioOpts.forEach(radio => {
+                radio.addEventListener('change', () => {
+                    document.querySelectorAll('label[id^="opt"]').forEach(lbl => {
+                        lbl.classList.remove('border-2', 'border-emerald-500', 'bg-emerald-50/50', 'dark:bg-emerald-950/30');
+                        lbl.classList.add('border', 'border-slate-200', 'dark:border-slate-700');
+                    });
+                    const parent = radio.closest('label');
+                    parent.classList.add('border-2', 'border-emerald-500', 'bg-emerald-50/50', 'dark:bg-emerald-950/30');
+                    parent.classList.remove('border-slate-200', 'dark:border-slate-700');
+
+                    if (radio.value === 'image/jpeg') {
+                        jpgQualityBox.classList.remove('hidden');
+                    } else {
+                        jpgQualityBox.classList.add('hidden');
+                    }
+                });
+            });
+
+            jpgQualitySlider.addEventListener('input', () => {
+                jpgQualityVal.textContent = jpgQualitySlider.value + '%';
+            });
+
+            processBtn.addEventListener('click', () => {
+                if (!loadedImage) {
+                    showError('Please select an image file first.');
+                    return;
+                }
+                hideError();
+
+                const targetMime = document.querySelector('input[name="targetFormat"]:checked').value;
+                const canvas = document.createElement('canvas');
+                canvas.width = loadedImage.naturalWidth;
+                canvas.height = loadedImage.naturalHeight;
+                const ctx = canvas.getContext('2d');
+
+                // If converting to JPEG, fill canvas with white background to handle transparency cleanly
+                if (targetMime === 'image/jpeg') {
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                }
+
+                ctx.drawImage(loadedImage, 0, 0);
+
+                const quality = targetMime === 'image/jpeg' ? (parseInt(jpgQualitySlider.value) / 100) : 0.95;
+
+                canvas.toBlob((blob) => {
+                    if (!blob) {
+                        showError('Conversion failed.');
+                        return;
+                    }
+                    convertedBlob = blob;
+
+                    const extMap = { 'image/png': '.png', 'image/jpeg': '.jpg', 'image/webp': '.webp' };
+                    const ext = extMap[targetMime] || '.png';
+                    const base = currentFile.name.replace(/\.[^.]+$/, '');
+                    downloadFileName = `${base}_converted${ext}`;
+
+                    resOrigFormat.textContent = (currentFile.type ? currentFile.type.split('/')[1].toUpperCase() : 'IMAGE');
+                    resOrigSize.textContent = FileGenius.Utils.formatBytes(currentFile.size);
+
+                    resNewFormat.textContent = ext.replace('.', '').toUpperCase();
+                    resNewSize.textContent = FileGenius.Utils.formatBytes(blob.size);
+
+                    resultImagePreview.src = URL.createObjectURL(blob);
+                    toolFormContainer.classList.add('hidden');
+                    resultContainer.classList.remove('hidden');
+                }, targetMime, quality);
+            });
+
+            downloadBtn.addEventListener('click', () => {
+                if (convertedBlob) {
+                    FileGenius.Utils.downloadBlob(convertedBlob, downloadFileName);
+                }
+            });
+
+            function resetAll() {
+                currentFile = null;
+                loadedImage = null;
+                convertedBlob = null;
+                fileInput.value = '';
+                sourceImagePreview.src = '#';
+                resultImagePreview.src = '#';
+                uploadPrompt.classList.remove('hidden');
+                previewZone.classList.add('hidden');
+                settingsBox.classList.add('hidden');
+                resultContainer.classList.add('hidden');
+                toolFormContainer.classList.remove('hidden');
+                hideError();
+            }
+
+            resetBtn.addEventListener('click', resetAll);
+            processAnotherBtn.addEventListener('click', resetAll);
+        });
+    </script>
+</body>
+</html>
+
+

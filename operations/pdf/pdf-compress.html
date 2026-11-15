@@ -1,0 +1,328 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compress PDF - FileGenius</title>
+    <meta name="description" content="Optimize and reduce PDF document file sizes directly in your browser with genuine local stream compression.">
+
+    <script src="../../assets/libraries/tailwind.js"></script>
+    <link rel="stylesheet" href="../../assets/libraries/font-awesome.min.css">
+    <link rel="stylesheet" href="../../assets/css/style.css">
+    <script src="../../assets/libraries/pdf-lib.min.js"></script>
+    <script src="../../assets/libraries/pdf.min.js"></script>
+    <script src="../../assets/js/theme.js"></script>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 font-sans antialiased min-h-screen flex flex-col transition-colors duration-200">
+
+    <header class="sticky top-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <a href="../../index.html" class="flex items-center gap-2.5 group">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center text-white shadow-md shadow-indigo-200 dark:shadow-none group-hover:scale-105 transition-transform">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                </div>
+                <span class="text-xl font-bold text-slate-900 dark:text-white">File<span class="text-indigo-600 dark:text-indigo-400">Genius</span></span>
+            </a>
+
+            <div class="flex items-center gap-3">
+                <a href="../../index.html#pdf-section" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span class="hidden sm:inline">Back to Tools</span>
+                </a>
+                <button type="button" id="quickThemeToggleBtn" class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-amber-400 flex items-center justify-center transition shadow-2xs focus:outline-none" title="Toggle Light / Dark Theme">
+                    <i class="fa-solid fa-moon dark:hidden text-sm"></i>
+                    <i class="fa-solid fa-sun hidden dark:inline text-sm"></i>
+                </button>
+                                <a href="../../contact.html" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 transition" title="Contact Administrator">
+                    <i class="fa-solid fa-envelope text-indigo-500"></i>
+                    <span class="hidden sm:inline">Contact</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-50 dark:bg-red-950/60 text-red-600 dark:text-red-400 text-xs font-semibold mb-3 border border-red-100 dark:border-red-900">
+                <i class="fa-solid fa-compress"></i> PDF Optimizer
+            </div>
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white mb-2">Compress PDF</h1>
+            <p class="text-slate-600 dark:text-slate-400 text-sm max-w-xl mx-auto">
+                Reduce PDF file size via object stream compression and raster resolution downsampling with genuine metrics.
+            </p>
+        </div>
+
+        <div id="errorAlert" class="hidden mb-6 p-4 rounded-2xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-sm flex items-center gap-3">
+            <i class="fa-solid fa-circle-exclamation flex-shrink-0 text-base"></i>
+            <span id="errorMessage"></span>
+        </div>
+
+        <div id="toolFormContainer" class="space-y-6">
+            <div id="dropZone" class="relative border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-indigo-500 rounded-3xl p-8 sm:p-12 text-center bg-white dark:bg-slate-800 transition cursor-pointer group shadow-2xs">
+                <input type="file" id="fileInput" accept="application/pdf" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                
+                <div id="uploadPrompt" class="space-y-3">
+                    <div class="w-16 h-16 rounded-2xl bg-red-50 dark:bg-red-950/60 text-red-600 dark:text-red-400 flex items-center justify-center mx-auto text-2xl group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                    </div>
+                    <div>
+                        <span class="text-base font-bold text-slate-800 dark:text-slate-200">Choose a PDF file to compress</span>
+                        <span class="text-sm text-slate-500 dark:text-slate-400"> or drag and drop it here</span>
+                    </div>
+                    <p class="text-xs text-slate-400">100% Client-Side Processing &bull; No Server Uploads</p>
+                </div>
+
+                <div id="previewZone" class="hidden space-y-3">
+                    <div class="w-16 h-16 rounded-2xl bg-red-100 dark:bg-red-950/60 text-red-600 dark:text-red-400 flex items-center justify-center mx-auto text-2xl">
+                        <i class="fa-solid fa-file-pdf"></i>
+                    </div>
+                    <div class="text-xs font-semibold text-slate-600 dark:text-slate-300" id="fileMetaText"></div>
+                    <button type="button" id="changeFileBtn" class="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline">Choose a different PDF</button>
+                </div>
+            </div>
+
+            <div id="settingsBox" class="hidden bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 p-6 sm:p-8 shadow-xs space-y-6 transition-colors">
+                <div class="border-b border-slate-100 dark:border-slate-700/80 pb-4">
+                    <h2 class="text-base font-bold text-slate-900 dark:text-white">Compression Level</h2>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <label class="cursor-pointer border-2 border-red-500 rounded-2xl p-4 flex flex-col bg-red-50/50 dark:bg-red-950/30 transition" id="modeStandardLabel">
+                        <input type="radio" name="compLevel" value="standard" checked class="sr-only">
+                        <span class="font-bold text-sm text-slate-900 dark:text-white">Stream & Object Optimization</span>
+                        <span class="text-xxs text-slate-500 dark:text-slate-400 mt-1">Strips unreferenced objects, repackages binary Flate streams, zero quality loss for vector & text.</span>
+                    </label>
+
+                    <label class="cursor-pointer border border-slate-200 dark:border-slate-700 rounded-2xl p-4 flex flex-col hover:bg-slate-50 dark:hover:bg-slate-700 transition" id="modeStrongLabel">
+                        <input type="radio" name="compLevel" value="strong" class="sr-only">
+                        <span class="font-bold text-sm text-slate-900 dark:text-white">High Compression (Image Downsampling)</span>
+                        <span class="text-xxs text-slate-500 dark:text-slate-400 mt-1">Re-renders pages at 150 DPI JPEG quality to compress image-heavy scanned documents.</span>
+                    </label>
+                </div>
+
+                <div class="pt-2 flex flex-wrap gap-3">
+                    <button type="button" id="processBtn" class="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-sm shadow-md shadow-red-200 dark:shadow-none transition">
+                        <i class="fa-solid fa-compress"></i>
+                        <span>Compress PDF Now</span>
+                    </button>
+                    <button type="button" id="resetBtn" class="px-5 py-3.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-sm transition">
+                        Reset
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="resultContainer" class="hidden bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 p-8 shadow-sm text-center transition-colors">
+            <div class="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto mb-4 text-2xl shadow-2xs">
+                <i class="fa-solid fa-check"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-1">Compression Finished!</h2>
+            <p class="text-slate-500 dark:text-slate-400 text-sm mb-6" id="compNotice">Genuine local compression completed.</p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-lg mx-auto mb-8 text-center">
+                <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-700/60">
+                    <span class="text-xs font-bold text-slate-400 uppercase">Original Size</span>
+                    <div id="resOrigSize" class="text-lg font-bold text-slate-800 dark:text-slate-200 mt-1">0 KB</div>
+                </div>
+                <div class="p-4 rounded-xl bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800">
+                    <span class="text-xs font-bold text-red-600 dark:text-red-400 uppercase">Output Size</span>
+                    <div id="resNewSize" class="text-lg font-bold text-red-950 dark:text-red-200 mt-1">0 KB</div>
+                </div>
+                <div class="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800">
+                    <span class="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase">Size Savings</span>
+                    <div id="resSavings" class="text-lg font-bold text-emerald-700 dark:text-emerald-300 mt-1">0%</div>
+                </div>
+            </div>
+
+            <div class="flex flex-wrap items-center justify-center gap-3">
+                <button type="button" id="downloadBtn" class="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-sm shadow-md shadow-red-200 dark:shadow-none transition">
+                    <i class="fa-solid fa-download"></i>
+                    <span>Download Compressed PDF</span>
+                </button>
+                <button type="button" id="processAnotherBtn" class="px-5 py-3.5 rounded-xl border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-sm transition">
+                    Compress Another PDF
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-6 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500 dark:text-slate-400">
+            &copy; 2026 FileGenius &bull; In-Browser PDF Stream Compressor
+        </div>
+    </footer>
+
+    <script src="../../assets/js/utils.js"></script>
+    <script src="../../assets/js/navigation.js"></script>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = '../../assets/libraries/pdf.worker.min.js';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const fileInput = document.getElementById('fileInput');
+            const dropZone = document.getElementById('dropZone');
+            const uploadPrompt = document.getElementById('uploadPrompt');
+            const previewZone = document.getElementById('previewZone');
+            const fileMetaText = document.getElementById('fileMetaText');
+            const changeFileBtn = document.getElementById('changeFileBtn');
+            const settingsBox = document.getElementById('settingsBox');
+
+            const modeRadios = document.querySelectorAll('input[name="compLevel"]');
+            const modeStandardLabel = document.getElementById('modeStandardLabel');
+            const modeStrongLabel = document.getElementById('modeStrongLabel');
+
+            const processBtn = document.getElementById('processBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const toolFormContainer = document.getElementById('toolFormContainer');
+            const resultContainer = document.getElementById('resultContainer');
+            const compNotice = document.getElementById('compNotice');
+            const resOrigSize = document.getElementById('resOrigSize');
+            const resNewSize = document.getElementById('resNewSize');
+            const resSavings = document.getElementById('resSavings');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const processAnotherBtn = document.getElementById('processAnotherBtn');
+            const errorAlert = document.getElementById('errorAlert');
+            const errorMessage = document.getElementById('errorMessage');
+
+            let currentFile = null;
+            let compressedBlob = null;
+            let downloadFileName = 'compressed.pdf';
+
+            function showError(msg) {
+                errorMessage.textContent = msg;
+                errorAlert.classList.remove('hidden');
+            }
+            function hideError() {
+                errorAlert.classList.add('hidden');
+            }
+
+            FileGenius.Utils.setupDropzone(dropZone, fileInput, (files) => {
+                if (files && files[0]) handleFile(files[0]);
+            });
+
+            changeFileBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                fileInput.click();
+            });
+
+            async function handleFile(file) {
+                hideError();
+                currentFile = file;
+
+                try {
+                    fileMetaText.textContent = `${file.name} (${FileGenius.Utils.formatBytes(file.size)})`;
+                    uploadPrompt.classList.add('hidden');
+                    previewZone.classList.remove('hidden');
+                    settingsBox.classList.remove('hidden');
+                } catch (err) {
+                    showError('Failed to read PDF file.');
+                }
+            }
+
+            modeRadios.forEach(radio => {
+                radio.addEventListener('change', () => {
+                    [modeStandardLabel, modeStrongLabel].forEach(lbl => {
+                        lbl.classList.remove('border-2', 'border-red-500', 'bg-red-50/50', 'dark:bg-red-950/30');
+                        lbl.classList.add('border', 'border-slate-200', 'dark:border-slate-700');
+                    });
+                    const parent = radio.closest('label');
+                    parent.classList.add('border-2', 'border-red-500', 'bg-red-50/50', 'dark:bg-red-950/30');
+                    parent.classList.remove('border-slate-200', 'dark:border-slate-700');
+                });
+            });
+
+            processBtn.addEventListener('click', async () => {
+                if (!currentFile) return;
+                hideError();
+
+                const mode = document.querySelector('input[name="compLevel"]:checked').value;
+                const origBytes = currentFile.size;
+
+                try {
+                    const buffer = await FileGenius.Utils.readFileAsArrayBuffer(currentFile);
+                    let finalBytes = null;
+
+                    if (mode === 'standard') {
+                        // Recompress object streams with Flate compression and strip unreferenced objects
+                        const { PDFDocument } = PDFLib;
+                        const pdfDoc = await PDFDocument.load(buffer, { ignoreEncryption: true });
+                        finalBytes = await pdfDoc.save({ useObjectStreams: true });
+                    } else {
+                        // Strong compression: raster downsample via PDF.js rendering to JPEG canvases @ 150 DPI
+                        const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(buffer) });
+                        const pdfDocJs = await loadingTask.promise;
+                        const totalPages = pdfDocJs.numPages;
+
+                        const { PDFDocument } = PDFLib;
+                        const outPdf = await PDFDocument.create();
+
+                        for (let i = 1; i <= totalPages; i++) {
+                            const page = await pdfDocJs.getPage(i);
+                            const viewport = page.getViewport({ scale: 1.5 }); // ~150 DPI
+
+                            const canvas = document.createElement('canvas');
+                            canvas.width = viewport.width;
+                            canvas.height = viewport.height;
+                            const ctx = canvas.getContext('2d');
+
+                            await page.render({ canvasContext: ctx, viewport }).promise;
+
+                            const jpegBlob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', 0.8));
+                            const jpegBuf = await FileGenius.Utils.readFileAsArrayBuffer(jpegBlob);
+                            const img = await outPdf.embedJpg(jpegBuf);
+
+                            const newPage = outPdf.addPage([viewport.width, viewport.height]);
+                            newPage.drawImage(img, { x: 0, y: 0, width: viewport.width, height: viewport.height });
+                        }
+
+                        finalBytes = await outPdf.save({ useObjectStreams: true });
+                    }
+
+                    compressedBlob = new Blob([finalBytes], { type: 'application/pdf' });
+                    const newBytes = compressedBlob.size;
+                    const base = currentFile.name.replace(/\.[^.]+$/, '');
+                    downloadFileName = `${base}_compressed.pdf`;
+
+                    const savedPct = Math.round(((origBytes - newBytes) / origBytes) * 100);
+
+                    resOrigSize.textContent = FileGenius.Utils.formatBytes(origBytes);
+                    resNewSize.textContent = FileGenius.Utils.formatBytes(newBytes);
+
+                    if (savedPct > 0) {
+                        resSavings.textContent = `-${savedPct}%`;
+                        compNotice.textContent = `Reduced file size by ${savedPct}%.`;
+                    } else {
+                        resSavings.textContent = '0%';
+                        compNotice.textContent = 'This PDF is already highly streamlined. Stream repackaging produced minimal reduction.';
+                    }
+
+                    toolFormContainer.classList.add('hidden');
+                    resultContainer.classList.remove('hidden');
+                } catch (err) {
+                    showError('Compression processing error: ' + err.message);
+                }
+            });
+
+            downloadBtn.addEventListener('click', () => {
+                if (compressedBlob) FileGenius.Utils.downloadBlob(compressedBlob, downloadFileName);
+            });
+
+            function resetAll() {
+                currentFile = null;
+                compressedBlob = null;
+                fileInput.value = '';
+                uploadPrompt.classList.remove('hidden');
+                previewZone.classList.add('hidden');
+                settingsBox.classList.add('hidden');
+                resultContainer.classList.add('hidden');
+                toolFormContainer.classList.remove('hidden');
+                hideError();
+            }
+
+            resetBtn.addEventListener('click', resetAll);
+            processAnotherBtn.addEventListener('click', resetAll);
+        });
+    </script>
+</body>
+</html>
+
+

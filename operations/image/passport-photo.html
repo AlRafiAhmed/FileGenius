@@ -1,0 +1,416 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Passport Photo Maker - FileGenius</title>
+    <meta name="description" content="Generate official US 2x2 inch and UK/EU 35x45mm passport and visa photos with single photo or 2x2 printable sheet export.">
+
+    <script src="../../assets/libraries/tailwind.js"></script>
+    <link rel="stylesheet" href="../../assets/libraries/font-awesome.min.css">
+    <link rel="stylesheet" href="../../assets/css/style.css">
+    <script src="../../assets/js/theme.js"></script>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 font-sans antialiased min-h-screen flex flex-col transition-colors duration-200">
+
+    <header class="sticky top-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <a href="../../index.html" class="flex items-center gap-2.5 group">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center text-white shadow-md shadow-indigo-200 dark:shadow-none group-hover:scale-105 transition-transform">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                </div>
+                <span class="text-xl font-bold text-slate-900 dark:text-white">File<span class="text-indigo-600 dark:text-indigo-400">Genius</span></span>
+            </a>
+
+            <div class="flex items-center gap-3">
+                <a href="../../index.html#image-section" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span class="hidden sm:inline">Back to Tools</span>
+                </a>
+                <button type="button" id="quickThemeToggleBtn" class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-amber-400 flex items-center justify-center transition shadow-2xs focus:outline-none" title="Toggle Light / Dark Theme">
+                    <i class="fa-solid fa-moon dark:hidden text-sm"></i>
+                    <i class="fa-solid fa-sun hidden dark:inline text-sm"></i>
+                </button>
+                                <a href="../../contact.html" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 transition" title="Contact Administrator">
+                    <i class="fa-solid fa-envelope text-indigo-500"></i>
+                    <span class="hidden sm:inline">Contact</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 text-xs font-semibold mb-3 border border-teal-100 dark:border-teal-900">
+                <i class="fa-solid fa-id-card"></i> Passport & ID Photo Maker
+            </div>
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white mb-2">Passport Photo</h1>
+            <p class="text-slate-600 dark:text-slate-400 text-sm max-w-xl mx-auto">
+                Crop standard US (2Ã—2 in) and UK/EU (35Ã—45 mm) ID biometric pictures and generate a printable 2Ã—2 grid layout.
+            </p>
+        </div>
+
+        <div id="errorAlert" class="hidden mb-6 p-4 rounded-2xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-sm flex items-center gap-3">
+            <i class="fa-solid fa-circle-exclamation flex-shrink-0 text-base"></i>
+            <span id="errorMessage"></span>
+        </div>
+
+        <div id="toolFormContainer" class="space-y-6">
+            <div id="dropZone" class="relative border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-indigo-500 rounded-3xl p-8 sm:p-12 text-center bg-white dark:bg-slate-800 transition cursor-pointer group shadow-2xs">
+                <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                
+                <div id="uploadPrompt" class="space-y-3">
+                    <div class="w-16 h-16 rounded-2xl bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 flex items-center justify-center mx-auto text-2xl group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                    </div>
+                    <div>
+                        <span class="text-base font-bold text-slate-800 dark:text-slate-200">Upload portrait photo</span>
+                        <span class="text-sm text-slate-500 dark:text-slate-400"> or drag and drop it here</span>
+                    </div>
+                    <p class="text-xs text-slate-400">Supports JPG, PNG, and WebP &bull; 100% In-Browser</p>
+                </div>
+            </div>
+
+            <div id="passportWorkspace" class="hidden bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 p-6 sm:p-8 shadow-xs space-y-6 transition-colors">
+                <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-700/80 pb-4">
+                    <h2 class="text-base font-bold text-slate-900 dark:text-white">Passport Framing & Size Preset</h2>
+                    <button type="button" id="changeImageBtn" class="text-xs font-semibold text-teal-600 dark:text-teal-400 hover:underline">Change Photo</button>
+                </div>
+
+                <!-- Preset Buttons -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <button type="button" data-preset="us" class="preset-btn p-4 rounded-2xl border-2 border-teal-500 bg-teal-50/50 dark:bg-teal-950/40 text-left transition">
+                        <div class="text-xs font-extrabold text-slate-900 dark:text-white">US Passport & Visa</div>
+                        <div class="text-xxs text-teal-600 dark:text-teal-400 font-semibold mt-0.5">2 &times; 2 inches (600 &times; 600 px)</div>
+                    </button>
+                    <button type="button" data-preset="uk" class="preset-btn p-4 rounded-2xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 text-left transition">
+                        <div class="text-xs font-extrabold text-slate-900 dark:text-white">UK / EU Passport</div>
+                        <div class="text-xxs text-slate-500 dark:text-slate-400 mt-0.5">35 &times; 45 mm (413 &times; 531 px)</div>
+                    </button>
+                    <button type="button" data-preset="custom" class="preset-btn p-4 rounded-2xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 text-left transition">
+                        <div class="text-xs font-extrabold text-slate-900 dark:text-white">Custom Dimensions</div>
+                        <div class="text-xxs text-slate-500 dark:text-slate-400 mt-0.5">Custom px sizing</div>
+                    </button>
+                </div>
+
+                <!-- Custom dimension fields (hidden unless custom chosen) -->
+                <div id="customDimRow" class="hidden grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Width (px)</label>
+                        <input type="number" id="customWidth" value="600" class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Height (px)</label>
+                        <input type="number" id="customHeight" value="600" class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm">
+                    </div>
+                </div>
+
+                <!-- Zoom and positioning sliders -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                    <div>
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="text-xs font-bold uppercase text-slate-500 dark:text-slate-400">Zoom / Scale</label>
+                            <span id="zoomDisplay" class="text-xs font-bold text-teal-600 dark:text-teal-400">100%</span>
+                        </div>
+                        <input type="range" id="zoomSlider" min="50" max="250" value="100" class="w-full accent-teal-500">
+                    </div>
+                    <div>
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="text-xs font-bold uppercase text-slate-500 dark:text-slate-400">Vertical Offset</label>
+                            <span id="offsetYDisplay" class="text-xs font-bold text-teal-600 dark:text-teal-400">0</span>
+                        </div>
+                        <input type="range" id="offsetYSlider" min="-150" max="150" value="0" class="w-full accent-teal-500">
+                    </div>
+                </div>
+
+                <!-- Framing Preview Box -->
+                <div class="text-center p-6 bg-slate-100 dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 flex justify-center">
+                    <div class="relative border-4 border-teal-500 rounded-2xl overflow-hidden shadow-md bg-white">
+                        <canvas id="passportCanvas" class="block max-h-[360px] object-contain"></canvas>
+                        <!-- Biometric Oval Overlay guideline -->
+                        <div class="absolute inset-0 pointer-events-none flex items-center justify-center opacity-30">
+                            <div class="w-3/5 h-4/5 border-2 border-dashed border-teal-800 rounded-full"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Export Mode Selection -->
+                <div class="pt-2 border-t border-slate-100 dark:border-slate-700/80">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Export Mode</label>
+                    <div class="flex flex-wrap gap-4">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="exportMode" value="single" checked class="text-teal-600 focus:ring-teal-500">
+                            <span class="text-xs font-bold text-slate-800 dark:text-slate-200">Single Photo (Individual File)</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="exportMode" value="grid" class="text-teal-600 focus:ring-teal-500">
+                            <span class="text-xs font-bold text-slate-800 dark:text-slate-200">Printable 2&times;2 Grid Sheet (4 Photos on 4&times;6" Canvas)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="pt-2 flex flex-wrap gap-3">
+                    <button type="button" id="processBtn" class="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-sm shadow-md shadow-teal-200 dark:shadow-none transition">
+                        <i class="fa-solid fa-download"></i>
+                        <span>Generate & Export Passport Photo</span>
+                    </button>
+                    <button type="button" id="resetBtn" class="px-5 py-3.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-sm transition">
+                        Reset
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="resultContainer" class="hidden bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 p-8 shadow-sm text-center transition-colors">
+            <div class="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto mb-4 text-2xl shadow-2xs">
+                <i class="fa-solid fa-check"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-1">Passport Photo Generated!</h2>
+            <p class="text-slate-500 dark:text-slate-400 text-sm mb-6">Formed to official specifications, ready for print or submission.</p>
+
+            <div class="max-w-md mx-auto mb-8 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700 p-2 bg-slate-100 dark:bg-slate-900">
+                <img id="resultImagePreview" src="#" alt="Passport Output" class="max-h-72 mx-auto object-contain rounded-xl shadow-xs">
+            </div>
+
+            <div class="flex flex-wrap items-center justify-center gap-3">
+                <button type="button" id="downloadBtn" class="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-sm shadow-md shadow-teal-200 dark:shadow-none transition">
+                    <i class="fa-solid fa-download"></i>
+                    <span>Download Photo</span>
+                </button>
+                <button type="button" id="processAnotherBtn" class="px-5 py-3.5 rounded-xl border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-sm transition">
+                    Format Another Photo
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-6 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500 dark:text-slate-400">
+            &copy; 2026 FileGenius &bull; In-Browser Passport & Visa Photo Creator
+        </div>
+    </footer>
+
+    <script src="../../assets/js/utils.js"></script>
+    <script src="../../assets/js/navigation.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const fileInput = document.getElementById('fileInput');
+            const dropZone = document.getElementById('dropZone');
+            const passportWorkspace = document.getElementById('passportWorkspace');
+            const passportCanvas = document.getElementById('passportCanvas');
+            const changeImageBtn = document.getElementById('changeImageBtn');
+
+            const presetBtns = document.querySelectorAll('.preset-btn');
+            const customDimRow = document.getElementById('customDimRow');
+            const customWidth = document.getElementById('customWidth');
+            const customHeight = document.getElementById('customHeight');
+
+            const zoomSlider = document.getElementById('zoomSlider');
+            const zoomDisplay = document.getElementById('zoomDisplay');
+            const offsetYSlider = document.getElementById('offsetYSlider');
+            const offsetYDisplay = document.getElementById('offsetYDisplay');
+
+            const processBtn = document.getElementById('processBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const toolFormContainer = document.getElementById('toolFormContainer');
+            const resultContainer = document.getElementById('resultContainer');
+            const resultImagePreview = document.getElementById('resultImagePreview');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const processAnotherBtn = document.getElementById('processAnotherBtn');
+            const errorAlert = document.getElementById('errorAlert');
+            const errorMessage = document.getElementById('errorMessage');
+
+            let currentFile = null;
+            let loadedImage = null;
+            let activePreset = 'us'; // 'us', 'uk', 'custom'
+            let targetW = 600;
+            let targetH = 600;
+            let finalBlob = null;
+            let downloadFileName = 'passport_photo.jpg';
+
+            function showError(msg) {
+                errorMessage.textContent = msg;
+                errorAlert.classList.remove('hidden');
+            }
+            function hideError() {
+                errorAlert.classList.add('hidden');
+            }
+
+            FileGenius.Utils.setupDropzone(dropZone, fileInput, (files) => {
+                if (files && files[0]) handleFile(files[0]);
+            });
+
+            changeImageBtn.addEventListener('click', () => fileInput.click());
+
+            async function handleFile(file) {
+                hideError();
+                currentFile = file;
+
+                try {
+                    const img = await FileGenius.Utils.loadImage(file);
+                    loadedImage = img;
+
+                    dropZone.classList.add('hidden');
+                    passportWorkspace.classList.remove('hidden');
+
+                    updatePresetDimensions();
+                    renderCanvas();
+                } catch (err) {
+                    showError('Failed to load image.');
+                }
+            }
+
+            function updatePresetDimensions() {
+                if (activePreset === 'us') {
+                    targetW = 600; targetH = 600; // 2x2 in @ 300dpi
+                    customDimRow.classList.add('hidden');
+                } else if (activePreset === 'uk') {
+                    targetW = 413; targetH = 531; // 35x45 mm @ 300dpi
+                    customDimRow.classList.add('hidden');
+                } else {
+                    targetW = parseInt(customWidth.value) || 600;
+                    targetH = parseInt(customHeight.value) || 600;
+                    customDimRow.classList.remove('hidden');
+                }
+            }
+
+            presetBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    presetBtns.forEach(b => {
+                        b.classList.remove('border-2', 'border-teal-500', 'bg-teal-50/50', 'dark:bg-teal-950/40');
+                        b.classList.add('border', 'border-slate-200', 'dark:border-slate-700');
+                    });
+                    btn.classList.add('border-2', 'border-teal-500', 'bg-teal-50/50', 'dark:bg-teal-950/40');
+                    btn.classList.remove('border-slate-200', 'dark:border-slate-700');
+
+                    activePreset = btn.getAttribute('data-preset');
+                    updatePresetDimensions();
+                    renderCanvas();
+                });
+            });
+
+            customWidth.addEventListener('input', () => {
+                updatePresetDimensions();
+                renderCanvas();
+            });
+            customHeight.addEventListener('input', () => {
+                updatePresetDimensions();
+                renderCanvas();
+            });
+
+            zoomSlider.addEventListener('input', () => {
+                zoomDisplay.textContent = zoomSlider.value + '%';
+                renderCanvas();
+            });
+            offsetYSlider.addEventListener('input', () => {
+                offsetYDisplay.textContent = offsetYSlider.value;
+                renderCanvas();
+            });
+
+            function renderCanvas() {
+                if (!loadedImage) return;
+
+                passportCanvas.width = targetW;
+                passportCanvas.height = targetH;
+                const ctx = passportCanvas.getContext('2d');
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, targetW, targetH);
+
+                const zoom = parseInt(zoomSlider.value) / 100;
+                const offsetY = parseInt(offsetYSlider.value);
+
+                const imgAspect = loadedImage.naturalWidth / loadedImage.naturalHeight;
+                const canvasAspect = targetW / targetH;
+
+                let drawW, drawH;
+                if (imgAspect > canvasAspect) {
+                    drawH = targetH * zoom;
+                    drawW = drawH * imgAspect;
+                } else {
+                    drawW = targetW * zoom;
+                    drawH = drawW / imgAspect;
+                }
+
+                const dx = (targetW - drawW) / 2;
+                const dy = ((targetH - drawH) / 2) + offsetY;
+
+                ctx.drawImage(loadedImage, dx, dy, drawW, drawH);
+            }
+
+            processBtn.addEventListener('click', () => {
+                if (!loadedImage) return;
+
+                const mode = document.querySelector('input[name="exportMode"]:checked').value;
+
+                if (mode === 'single') {
+                    passportCanvas.toBlob((blob) => {
+                        finalBlob = blob;
+                        downloadFileName = `passport_photo_${targetW}x${targetH}.jpg`;
+                        resultImagePreview.src = URL.createObjectURL(blob);
+                        toolFormContainer.classList.add('hidden');
+                        resultContainer.classList.remove('hidden');
+                    }, 'image/jpeg', 0.95);
+                } else {
+                    // Printable 2x2 grid on a 4x6 inch canvas (1200 x 1800 px @ 300 DPI)
+                    const gridCanvas = document.createElement('canvas');
+                    gridCanvas.width = 1800; // 6 inches @ 300 DPI
+                    gridCanvas.height = 1200; // 4 inches @ 300 DPI
+                    const gCtx = gridCanvas.getContext('2d');
+
+                    gCtx.fillStyle = '#ffffff';
+                    gCtx.fillRect(0, 0, gridCanvas.width, gridCanvas.height);
+
+                    // 4 photo positions
+                    const startX = (1800 - (targetW * 2 + 80)) / 2;
+                    const startY = (1200 - (targetH * 2 + 80)) / 2;
+
+                    for (let r = 0; r < 2; r++) {
+                        for (let c = 0; c < 2; c++) {
+                            const px = startX + c * (targetW + 80);
+                            const py = startY + r * (targetH + 80);
+                            gCtx.drawImage(passportCanvas, px, py, targetW, targetH);
+                            // Cutting border guideline
+                            gCtx.strokeStyle = '#e2e8f0';
+                            gCtx.lineWidth = 1;
+                            gCtx.strokeRect(px, py, targetW, targetH);
+                        }
+                    }
+
+                    gridCanvas.toBlob((blob) => {
+                        finalBlob = blob;
+                        downloadFileName = 'passport_photos_4x6_grid.jpg';
+                        resultImagePreview.src = URL.createObjectURL(blob);
+                        toolFormContainer.classList.add('hidden');
+                        resultContainer.classList.remove('hidden');
+                    }, 'image/jpeg', 0.95);
+                }
+            });
+
+            downloadBtn.addEventListener('click', () => {
+                if (finalBlob) FileGenius.Utils.downloadBlob(finalBlob, downloadFileName);
+            });
+
+            function resetAll() {
+                currentFile = null;
+                loadedImage = null;
+                finalBlob = null;
+                fileInput.value = '';
+                zoomSlider.value = 100;
+                offsetYSlider.value = 0;
+                zoomDisplay.textContent = '100%';
+                offsetYDisplay.textContent = '0';
+                dropZone.classList.remove('hidden');
+                passportWorkspace.classList.add('hidden');
+                resultContainer.classList.add('hidden');
+                toolFormContainer.classList.remove('hidden');
+                hideError();
+            }
+
+            resetBtn.addEventListener('click', resetAll);
+            processAnotherBtn.addEventListener('click', resetAll);
+        });
+    </script>
+</body>
+</html>
+
+

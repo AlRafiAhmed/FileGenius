@@ -1,0 +1,20 @@
+[
+    {
+        "id": 1,
+        "name": "Alice Smith",
+        "role": "Developer",
+        "city": "Berlin"
+    },
+    {
+        "id": 2,
+        "name": "Bob Jones",
+        "role": "Designer",
+        "city": "Toronto"
+    },
+    {
+        "id": 3,
+        "name": "Charlie Lee",
+        "role": "Manager",
+        "city": "Singapore"
+    }
+]

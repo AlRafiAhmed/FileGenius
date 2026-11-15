@@ -1,0 +1,251 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extract ZIP Archive - FileGenius</title>
+    <meta name="description" content="Safely inspect and extract files from ZIP archives in your browser with built-in path traversal security protection.">
+
+    <script src="../../assets/libraries/tailwind.js"></script>
+    <link rel="stylesheet" href="../../assets/libraries/font-awesome.min.css">
+    <link rel="stylesheet" href="../../assets/css/style.css">
+    <script src="../../assets/libraries/jszip.min.js"></script>
+    <script src="../../assets/js/theme.js"></script>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 font-sans antialiased min-h-screen flex flex-col transition-colors duration-200">
+
+    <header class="sticky top-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <a href="../../index.html" class="flex items-center gap-2.5 group">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center text-white shadow-md shadow-indigo-200 dark:shadow-none group-hover:scale-105 transition-transform">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                </div>
+                <span class="text-xl font-bold text-slate-900 dark:text-white">File<span class="text-indigo-600 dark:text-indigo-400">Genius</span></span>
+            </a>
+
+            <div class="flex items-center gap-3">
+                <a href="../../index.html#file-section" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span class="hidden sm:inline">Back to Tools</span>
+                </a>
+                <button type="button" id="quickThemeToggleBtn" class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-amber-400 flex items-center justify-center transition shadow-2xs focus:outline-none" title="Toggle Light / Dark Theme">
+                    <i class="fa-solid fa-moon dark:hidden text-sm"></i>
+                    <i class="fa-solid fa-sun hidden dark:inline text-sm"></i>
+                </button>
+                                <a href="../../contact.html" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 transition" title="Contact Administrator">
+                    <i class="fa-solid fa-envelope text-indigo-500"></i>
+                    <span class="hidden sm:inline">Contact</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 text-xs font-semibold mb-3 border border-amber-100 dark:border-amber-900">
+                <i class="fa-solid fa-box-open"></i> Archive Inspector
+            </div>
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white mb-2">Extract ZIP Archive</h1>
+            <p class="text-slate-600 dark:text-slate-400 text-sm max-w-xl mx-auto">
+                Inspect files inside a ZIP archive and extract them individually with path traversal security filtering.
+            </p>
+        </div>
+
+        <div id="errorAlert" class="hidden mb-6 p-4 rounded-2xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-sm flex items-center gap-3">
+            <i class="fa-solid fa-circle-exclamation flex-shrink-0 text-base"></i>
+            <span id="errorMessage"></span>
+        </div>
+
+        <div id="toolFormContainer" class="space-y-6">
+            <div id="dropZone" class="relative border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-indigo-500 rounded-3xl p-8 sm:p-12 text-center bg-white dark:bg-slate-800 transition cursor-pointer group shadow-2xs">
+                <input type="file" id="fileInput" accept=".zip,application/zip" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                
+                <div id="uploadPrompt" class="space-y-3">
+                    <div class="w-16 h-16 rounded-2xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center mx-auto text-2xl group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-box-open"></i>
+                    </div>
+                    <div>
+                        <span class="text-base font-bold text-slate-800 dark:text-slate-200">Choose a ZIP archive to unpack</span>
+                        <span class="text-sm text-slate-500 dark:text-slate-400"> or drag and drop it here</span>
+                    </div>
+                    <p class="text-xs text-slate-400">100% In-Browser &bull; Traversal Protection Enabled</p>
+                </div>
+            </div>
+
+            <!-- Archive Content Table -->
+            <div id="archiveWorkspace" class="hidden bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 p-6 sm:p-8 shadow-xs space-y-6 transition-colors">
+                <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-700/80 pb-4">
+                    <div>
+                        <h2 class="text-base font-bold text-slate-900 dark:text-white" id="archiveFileName">Archive Contents</h2>
+                        <span id="entryCountBadge" class="text-xs text-slate-400 font-semibold">0 entries found</span>
+                    </div>
+                    <button type="button" id="changeZipBtn" class="text-xs font-semibold text-amber-600 dark:text-amber-400 hover:underline">Change Archive</button>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead>
+                            <tr class="border-b border-slate-100 dark:border-slate-700/80 text-slate-400 font-bold uppercase text-xxs">
+                                <th class="py-2.5 px-3">File Name</th>
+                                <th class="py-2.5 px-3">Size</th>
+                                <th class="py-2.5 px-3 text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="entriesTableBody" class="divide-y divide-slate-100 dark:divide-slate-700/60"></tbody>
+                    </table>
+                </div>
+
+                <div class="pt-2 flex flex-wrap gap-3">
+                    <button type="button" id="downloadAllBtn" class="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-sm shadow-md shadow-amber-200 dark:shadow-none transition">
+                        <i class="fa-solid fa-download"></i>
+                        <span>Download All Extracted Files (Clean ZIP)</span>
+                    </button>
+                    <button type="button" id="resetBtn" class="px-5 py-3.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-sm transition">
+                        Reset
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-6 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500 dark:text-slate-400">
+            &copy; 2026 FileGenius &bull; In-Browser ZIP Archive Extractor
+        </div>
+    </footer>
+
+    <script src="../../assets/js/utils.js"></script>
+    <script src="../../assets/js/navigation.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const fileInput = document.getElementById('fileInput');
+            const dropZone = document.getElementById('dropZone');
+            const archiveWorkspace = document.getElementById('archiveWorkspace');
+            const archiveFileName = document.getElementById('archiveFileName');
+            const entryCountBadge = document.getElementById('entryCountBadge');
+            const entriesTableBody = document.getElementById('entriesTableBody');
+            const changeZipBtn = document.getElementById('changeZipBtn');
+
+            const downloadAllBtn = document.getElementById('downloadAllBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const errorAlert = document.getElementById('errorAlert');
+            const errorMessage = document.getElementById('errorMessage');
+
+            let currentZip = null;
+            let currentFile = null;
+            let extractedEntries = []; // { name, originalName, size, entryObj }
+
+            function showError(msg) {
+                errorMessage.textContent = msg;
+                errorAlert.classList.remove('hidden');
+            }
+            function hideError() {
+                errorAlert.classList.add('hidden');
+            }
+
+            FileGenius.Utils.setupDropzone(dropZone, fileInput, (files) => {
+                if (files && files[0]) handleFile(files[0]);
+            });
+
+            changeZipBtn.addEventListener('click', () => fileInput.click());
+
+            async function handleFile(file) {
+                hideError();
+                currentFile = file;
+
+                try {
+                    const buf = await FileGenius.Utils.readFileAsArrayBuffer(file);
+                    const zip = await JSZip.loadAsync(buf);
+                    currentZip = zip;
+
+                    extractedEntries = [];
+                    entriesTableBody.innerHTML = '';
+                    archiveFileName.textContent = file.name;
+
+                    zip.forEach((relativePath, zipEntry) => {
+                        // Security: Check for path traversal attacks
+                        if (relativePath.includes('..') || relativePath.startsWith('/') || relativePath.startsWith('\\')) {
+                            console.warn('Blocked path traversal entry:', relativePath);
+                            return;
+                        }
+
+                        if (!zipEntry.dir) {
+                            // Sanitized basename or safe relative path
+                            const safeName = relativePath.replace(/^[/\\]+/, '').replace(/\.\.[/\\]/g, '');
+                            extractedEntries.push({
+                                name: safeName,
+                                originalName: relativePath,
+                                size: zipEntry._data.uncompressedSize || 0,
+                                entry: zipEntry
+                            });
+                        }
+                    });
+
+                    entryCountBadge.textContent = `${extractedEntries.length} file${extractedEntries.length !== 1 ? 's' : ''} in archive`;
+
+                    extractedEntries.forEach((item, index) => {
+                        const tr = document.createElement('tr');
+                        tr.className = 'hover:bg-slate-50 dark:hover:bg-slate-900/40 transition';
+                        tr.innerHTML = `
+                            <td class="py-3 px-3 font-semibold text-slate-800 dark:text-slate-200">
+                                <div class="flex items-center gap-2 truncate max-w-sm">
+                                    <i class="fa-solid fa-file text-slate-400"></i>
+                                    <span>${FileGenius.Utils.escapeHtml(item.name)}</span>
+                                </div>
+                            </td>
+                            <td class="py-3 px-3 text-slate-500 dark:text-slate-400">${FileGenius.Utils.formatBytes(item.size)}</td>
+                            <td class="py-3 px-3 text-right">
+                                <button type="button" class="btn-extract px-3 py-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 font-bold text-xxs transition">
+                                    <i class="fa-solid fa-download mr-1"></i> Extract
+                                </button>
+                            </td>
+                        `;
+
+                        tr.querySelector('.btn-extract').addEventListener('click', async () => {
+                            const blob = await item.entry.async('blob');
+                            const downloadName = item.name.split('/').pop() || item.name;
+                            FileGenius.Utils.downloadBlob(blob, downloadName);
+                        });
+
+                        entriesTableBody.appendChild(tr);
+                    });
+
+                    dropZone.classList.add('hidden');
+                    archiveWorkspace.classList.remove('hidden');
+                } catch (err) {
+                    showError('Failed to read ZIP archive. File may be corrupt or encrypted.');
+                }
+            }
+
+            downloadAllBtn.addEventListener('click', async () => {
+                if (!currentZip || extractedEntries.length === 0) return;
+                const newZip = new JSZip();
+
+                for (const item of extractedEntries) {
+                    const blob = await item.entry.async('blob');
+                    newZip.file(item.name, blob);
+                }
+
+                const cleanedZipBlob = await newZip.generateAsync({ type: 'blob' });
+                const base = currentFile.name.replace(/\.[^.]+$/, '');
+                FileGenius.Utils.downloadBlob(cleanedZipBlob, `${base}_cleaned.zip`);
+            });
+
+            function resetAll() {
+                currentZip = null;
+                currentFile = null;
+                extractedEntries = [];
+                fileInput.value = '';
+                entriesTableBody.innerHTML = '';
+                dropZone.classList.remove('hidden');
+                archiveWorkspace.classList.add('hidden');
+                hideError();
+            }
+
+            resetBtn.addEventListener('click', resetAll);
+        });
+    </script>
+</body>
+</html>
+
+

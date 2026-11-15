@@ -1,0 +1,376 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compress Image - FileGenius</title>
+    <meta name="description" content="Compress JPG, PNG, and WebP images locally in your browser with real-time compression quality and file size savings.">
+
+    <script src="../../assets/libraries/tailwind.js"></script>
+    <link rel="stylesheet" href="../../assets/libraries/font-awesome.min.css">
+    <link rel="stylesheet" href="../../assets/css/style.css">
+    <script src="../../assets/js/theme.js"></script>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 font-sans antialiased min-h-screen flex flex-col transition-colors duration-200">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <a href="../../index.html" class="flex items-center gap-2.5 group">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center text-white shadow-md shadow-indigo-200 dark:shadow-none group-hover:scale-105 transition-transform">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                </div>
+                <span class="text-xl font-bold text-slate-900 dark:text-white">File<span class="text-indigo-600 dark:text-indigo-400">Genius</span></span>
+            </a>
+
+            <div class="flex items-center gap-3">
+                <a href="../../index.html#image-section" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span class="hidden sm:inline">Back to Tools</span>
+                </a>
+
+                <button type="button" id="quickThemeToggleBtn" class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-amber-400 flex items-center justify-center transition shadow-2xs focus:outline-none" title="Toggle Light / Dark Theme">
+                    <i class="fa-solid fa-moon dark:hidden text-sm"></i>
+                    <i class="fa-solid fa-sun hidden dark:inline text-sm"></i>
+                </button>
+
+                                <a href="../../contact.html" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 transition" title="Contact Administrator">
+                    <i class="fa-solid fa-envelope text-indigo-500"></i>
+                    <span class="hidden sm:inline">Contact</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-grow max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
+        <!-- Title & Breadcrumbs -->
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 text-xs font-semibold mb-3 border border-amber-100 dark:border-amber-900">
+                <i class="fa-solid fa-compress"></i> Image Compression Tool
+            </div>
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white mb-2">Compress Image</h1>
+            <p class="text-slate-600 dark:text-slate-400 text-sm max-w-xl mx-auto">
+                Optimize image file sizes locally with granular quality controls and genuine byte-reduction metrics.
+            </p>
+        </div>
+
+        <!-- Error Alert -->
+        <div id="errorAlert" class="hidden mb-6 p-4 rounded-2xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-sm flex items-center gap-3">
+            <i class="fa-solid fa-circle-exclamation flex-shrink-0 text-base"></i>
+            <span id="errorMessage"></span>
+        </div>
+
+        <!-- Tool Form Container -->
+        <div id="toolFormContainer" class="space-y-6">
+            <!-- Dropzone -->
+            <div id="dropZone" class="relative border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-indigo-500 rounded-3xl p-8 sm:p-12 text-center bg-white dark:bg-slate-800 transition cursor-pointer group shadow-2xs">
+                <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                
+                <div id="uploadPrompt" class="space-y-3">
+                    <div class="w-16 h-16 rounded-2xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center mx-auto text-2xl group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                    </div>
+                    <div>
+                        <span class="text-base font-bold text-slate-800 dark:text-slate-200">Choose an image to compress</span>
+                        <span class="text-sm text-slate-500 dark:text-slate-400"> or drag and drop it here</span>
+                    </div>
+                    <p class="text-xs text-slate-400">Supports JPG, PNG, and WebP &bull; 100% In-Browser</p>
+                </div>
+
+                <div id="previewZone" class="hidden space-y-3">
+                    <div class="max-h-64 mx-auto rounded-xl overflow-hidden inline-block border border-slate-200 dark:border-slate-700 bg-checkered p-1">
+                        <img id="sourceImagePreview" src="#" alt="Loaded Preview" class="max-h-60 mx-auto object-contain rounded-lg">
+                    </div>
+                    <div class="text-xs font-semibold text-slate-600 dark:text-slate-300" id="fileMetaText"></div>
+                    <button type="button" id="changeFileBtn" class="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline">Choose a different image</button>
+                </div>
+            </div>
+
+            <!-- Settings Box -->
+            <div id="settingsBox" class="hidden bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 p-6 sm:p-8 shadow-xs space-y-6 transition-colors">
+                <div class="border-b border-slate-100 dark:border-slate-700/80 pb-4">
+                    <h2 class="text-base font-bold text-slate-900 dark:text-white">Compression Settings</h2>
+                </div>
+
+                <!-- Quality Slider -->
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between">
+                        <label class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Compression Quality</label>
+                        <span id="qualityValDisplay" class="text-sm font-extrabold text-amber-600 dark:text-amber-400">75%</span>
+                    </div>
+                    <input type="range" id="qualitySlider" min="5" max="100" value="75" class="w-full accent-amber-500 cursor-pointer">
+                    <div class="flex justify-between text-xxs text-slate-400 font-semibold">
+                        <span>Low Quality (Smallest File)</span>
+                        <span>Balanced (Recommended)</span>
+                        <span>Maximum Quality</span>
+                    </div>
+                </div>
+
+                <!-- Optional Target Size Option -->
+                <div class="pt-2 border-t border-slate-100 dark:border-slate-700/80">
+                    <div class="flex items-center gap-2 mb-3">
+                        <input type="checkbox" id="enableTargetSize" class="w-4 h-4 rounded text-amber-500 focus:ring-amber-500 dark:bg-slate-900 dark:border-slate-700">
+                        <label for="enableTargetSize" class="text-xs font-semibold text-slate-700 dark:text-slate-300 cursor-pointer">
+                            Enable Target Maximum File Size (KB)
+                        </label>
+                    </div>
+                    <div id="targetSizeInputBox" class="hidden pl-6">
+                        <div class="flex items-center gap-3">
+                            <input type="number" id="targetSizeKb" min="10" placeholder="e.g. 200" class="w-40 px-3.5 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500">
+                            <span class="text-xs text-slate-500 dark:text-slate-400">KB max threshold</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Button -->
+                <div class="pt-2 flex flex-wrap gap-3">
+                    <button type="button" id="processBtn" class="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-sm shadow-md shadow-amber-200 dark:shadow-none transition">
+                        <i class="fa-solid fa-compress"></i>
+                        <span>Compress Image Now</span>
+                    </button>
+                    <button type="button" id="resetBtn" class="px-5 py-3.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-sm transition">
+                        Reset
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Output / Result Card -->
+        <div id="resultContainer" class="hidden bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 p-8 shadow-sm text-center transition-colors">
+            <div class="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto mb-4 text-2xl shadow-2xs">
+                <i class="fa-solid fa-check"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-1">Image Compressed Successfully!</h2>
+            <p class="text-slate-500 dark:text-slate-400 text-sm mb-6">Genuine local compression completed with zero cloud uploads.</p>
+
+            <!-- Metrics comparison -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-xl mx-auto mb-8 text-left">
+                <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-700/60">
+                    <span class="text-xs font-bold text-slate-400 uppercase">Original Size</span>
+                    <div id="resOrigSize" class="text-lg font-bold text-slate-800 dark:text-slate-200 mt-1">0 KB</div>
+                </div>
+                <div class="p-4 rounded-xl bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800">
+                    <span class="text-xs font-bold text-amber-600 dark:text-amber-400 uppercase">Compressed Size</span>
+                    <div id="resNewSize" class="text-lg font-bold text-amber-950 dark:text-amber-200 mt-1">0 KB</div>
+                </div>
+                <div class="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800">
+                    <span class="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase">Saved</span>
+                    <div id="resSavings" class="text-lg font-bold text-emerald-700 dark:text-emerald-300 mt-1">0%</div>
+                </div>
+            </div>
+
+            <!-- Preview Image -->
+            <div class="max-w-md mx-auto mb-8 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700 p-2 bg-checkered">
+                <img id="resultImagePreview" src="#" alt="Compressed Image" class="max-h-64 mx-auto object-contain rounded-xl">
+            </div>
+
+            <!-- Buttons -->
+            <div class="flex flex-wrap items-center justify-center gap-3">
+                <button type="button" id="downloadBtn" class="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-sm shadow-md shadow-amber-200 dark:shadow-none transition">
+                    <i class="fa-solid fa-download"></i>
+                    <span>Download Compressed Image</span>
+                </button>
+                <button type="button" id="processAnotherBtn" class="px-5 py-3.5 rounded-xl border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-sm transition">
+                    Compress Another Image
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-6 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500 dark:text-slate-400">
+            &copy; 2026 FileGenius &bull; In-Browser Image Compression
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="../../assets/js/utils.js"></script>
+    <script src="../../assets/js/navigation.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const fileInput = document.getElementById('fileInput');
+            const dropZone = document.getElementById('dropZone');
+            const uploadPrompt = document.getElementById('uploadPrompt');
+            const previewZone = document.getElementById('previewZone');
+            const sourceImagePreview = document.getElementById('sourceImagePreview');
+            const fileMetaText = document.getElementById('fileMetaText');
+            const changeFileBtn = document.getElementById('changeFileBtn');
+            const settingsBox = document.getElementById('settingsBox');
+            const errorAlert = document.getElementById('errorAlert');
+            const errorMessage = document.getElementById('errorMessage');
+
+            const qualitySlider = document.getElementById('qualitySlider');
+            const qualityValDisplay = document.getElementById('qualityValDisplay');
+            const enableTargetSize = document.getElementById('enableTargetSize');
+            const targetSizeInputBox = document.getElementById('targetSizeInputBox');
+            const targetSizeKb = document.getElementById('targetSizeKb');
+
+            const processBtn = document.getElementById('processBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const toolFormContainer = document.getElementById('toolFormContainer');
+            const resultContainer = document.getElementById('resultContainer');
+            const resultImagePreview = document.getElementById('resultImagePreview');
+            const resOrigSize = document.getElementById('resOrigSize');
+            const resNewSize = document.getElementById('resNewSize');
+            const resSavings = document.getElementById('resSavings');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const processAnotherBtn = document.getElementById('processAnotherBtn');
+
+            let currentFile = null;
+            let loadedImage = null;
+            let compressedBlob = null;
+            let downloadFileName = 'compressed_image.jpg';
+
+            function showError(msg) {
+                errorMessage.textContent = msg;
+                errorAlert.classList.remove('hidden');
+            }
+            function hideError() {
+                errorAlert.classList.add('hidden');
+            }
+
+            FileGenius.Utils.setupDropzone(dropZone, fileInput, (files) => {
+                if (files && files[0]) handleFile(files[0]);
+            });
+
+            changeFileBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                fileInput.click();
+            });
+
+            async function handleFile(file) {
+                hideError();
+                if (!file.type.match(/^image\/(jpeg|png|webp)$/i)) {
+                    showError('Please upload a valid JPG, PNG, or WebP image.');
+                    return;
+                }
+                currentFile = file;
+
+                try {
+                    const img = await FileGenius.Utils.loadImage(file);
+                    loadedImage = img;
+                    sourceImagePreview.src = img.src;
+                    fileMetaText.textContent = `${file.name} â€” ${img.naturalWidth} Ã— ${img.naturalHeight} px (${FileGenius.Utils.formatBytes(file.size)})`;
+
+                    uploadPrompt.classList.add('hidden');
+                    previewZone.classList.remove('hidden');
+                    settingsBox.classList.remove('hidden');
+                } catch (err) {
+                    showError('Failed to load image.');
+                }
+            }
+
+            qualitySlider.addEventListener('input', () => {
+                qualityValDisplay.textContent = qualitySlider.value + '%';
+            });
+
+            enableTargetSize.addEventListener('change', () => {
+                if (enableTargetSize.checked) {
+                    targetSizeInputBox.classList.remove('hidden');
+                } else {
+                    targetSizeInputBox.classList.add('hidden');
+                }
+            });
+
+            // Compress algorithm
+            processBtn.addEventListener('click', async () => {
+                if (!loadedImage) {
+                    showError('Please upload an image first.');
+                    return;
+                }
+                hideError();
+
+                const canvas = document.createElement('canvas');
+                canvas.width = loadedImage.naturalWidth;
+                canvas.height = loadedImage.naturalHeight;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(loadedImage, 0, 0);
+
+                let format = currentFile.type || 'image/jpeg';
+                // If PNG and user wants strong lossy compression, converting to WebP or high-efficiency WebP/JPEG retains visual quality
+                if (format === 'image/png') {
+                    format = 'image/webp'; // WebP supports transparency with lossy compression
+                }
+
+                let quality = parseInt(qualitySlider.value) / 100;
+
+                const getBlobAtQuality = (q) => {
+                    return new Promise((resolve) => {
+                        canvas.toBlob((b) => resolve(b), format, q);
+                    });
+                };
+
+                // Iterative binary search if target size is set
+                let bestBlob = null;
+                if (enableTargetSize.checked && targetSizeKb.value) {
+                    const maxBytes = parseInt(targetSizeKb.value) * 1024;
+                    let minQ = 0.05;
+                    let maxQ = 0.98;
+                    for (let iter = 0; iter < 6; iter++) {
+                        const midQ = (minQ + maxQ) / 2;
+                        const b = await getBlobAtQuality(midQ);
+                        bestBlob = b;
+                        if (b.size > maxBytes) {
+                            maxQ = midQ;
+                        } else {
+                            minQ = midQ;
+                        }
+                    }
+                } else {
+                    bestBlob = await getBlobAtQuality(quality);
+                }
+
+                if (!bestBlob) {
+                    showError('Failed to compress image in browser.');
+                    return;
+                }
+
+                compressedBlob = bestBlob;
+                const ext = format === 'image/webp' ? '.webp' : (format === 'image/png' ? '.png' : '.jpg');
+                const baseName = currentFile.name.replace(/\.[^.]+$/, '');
+                downloadFileName = `${baseName}_compressed${ext}`;
+
+                const origBytes = currentFile.size;
+                const newBytes = bestBlob.size;
+                const diffPct = Math.round(((origBytes - newBytes) / origBytes) * 100);
+
+                resOrigSize.textContent = FileGenius.Utils.formatBytes(origBytes);
+                resNewSize.textContent = FileGenius.Utils.formatBytes(newBytes);
+                resSavings.textContent = (diffPct > 0 ? `-${diffPct}%` : '0%');
+
+                resultImagePreview.src = URL.createObjectURL(bestBlob);
+                toolFormContainer.classList.add('hidden');
+                resultContainer.classList.remove('hidden');
+            });
+
+            downloadBtn.addEventListener('click', () => {
+                if (compressedBlob) {
+                    FileGenius.Utils.downloadBlob(compressedBlob, downloadFileName);
+                }
+            });
+
+            function resetAll() {
+                currentFile = null;
+                loadedImage = null;
+                compressedBlob = null;
+                fileInput.value = '';
+                sourceImagePreview.src = '#';
+                resultImagePreview.src = '#';
+                uploadPrompt.classList.remove('hidden');
+                previewZone.classList.add('hidden');
+                settingsBox.classList.add('hidden');
+                resultContainer.classList.add('hidden');
+                toolFormContainer.classList.remove('hidden');
+                hideError();
+            }
+
+            resetBtn.addEventListener('click', resetAll);
+            processAnotherBtn.addEventListener('click', resetAll);
+        });
+    </script>
+</body>
+</html>
+
+

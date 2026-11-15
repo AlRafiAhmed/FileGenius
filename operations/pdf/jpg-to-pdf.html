@@ -1,0 +1,356 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JPG to PDF - FileGenius</title>
+    <meta name="description" content="Convert JPG and JPEG pictures into standardized multi-page PDF documents directly in your browser.">
+
+    <script src="../../assets/libraries/tailwind.js"></script>
+    <link rel="stylesheet" href="../../assets/libraries/font-awesome.min.css">
+    <link rel="stylesheet" href="../../assets/css/style.css">
+    <script src="../../assets/libraries/pdf-lib.min.js"></script>
+    <script src="../../assets/js/theme.js"></script>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 font-sans antialiased min-h-screen flex flex-col transition-colors duration-200">
+
+    <header class="sticky top-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <a href="../../index.html" class="flex items-center gap-2.5 group">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center text-white shadow-md shadow-indigo-200 dark:shadow-none group-hover:scale-105 transition-transform">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                </div>
+                <span class="text-xl font-bold text-slate-900 dark:text-white">File<span class="text-indigo-600 dark:text-indigo-400">Genius</span></span>
+            </a>
+
+            <div class="flex items-center gap-3">
+                <a href="../../index.html#pdf-section" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span class="hidden sm:inline">Back to Tools</span>
+                </a>
+                <button type="button" id="quickThemeToggleBtn" class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-amber-400 flex items-center justify-center transition shadow-2xs focus:outline-none" title="Toggle Light / Dark Theme">
+                    <i class="fa-solid fa-moon dark:hidden text-sm"></i>
+                    <i class="fa-solid fa-sun hidden dark:inline text-sm"></i>
+                </button>
+                                <a href="../../contact.html" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 transition" title="Contact Administrator">
+                    <i class="fa-solid fa-envelope text-indigo-500"></i>
+                    <span class="hidden sm:inline">Contact</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-pink-50 dark:bg-pink-950/60 text-pink-600 dark:text-pink-400 text-xs font-semibold mb-3 border border-pink-100 dark:border-pink-900">
+                <i class="fa-solid fa-file-pdf"></i> JPG Converter
+            </div>
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white mb-2">JPG to PDF</h1>
+            <p class="text-slate-600 dark:text-slate-400 text-sm max-w-xl mx-auto">
+                Convert multiple JPG and JPEG pictures into a professional multi-page PDF document.
+            </p>
+        </div>
+
+        <div id="errorAlert" class="hidden mb-6 p-4 rounded-2xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-sm flex items-center gap-3">
+            <i class="fa-solid fa-circle-exclamation flex-shrink-0 text-base"></i>
+            <span id="errorMessage"></span>
+        </div>
+
+        <div id="toolFormContainer" class="space-y-6">
+            <div id="dropZone" class="relative border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-indigo-500 rounded-3xl p-8 sm:p-12 text-center bg-white dark:bg-slate-800 transition cursor-pointer group shadow-2xs">
+                <input type="file" id="fileInput" multiple accept="image/jpeg" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                
+                <div class="space-y-3">
+                    <div class="w-16 h-16 rounded-2xl bg-pink-50 dark:bg-pink-950/60 text-pink-600 dark:text-pink-400 flex items-center justify-center mx-auto text-2xl group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-file-pdf"></i>
+                    </div>
+                    <div>
+                        <span class="text-base font-bold text-slate-800 dark:text-slate-200">Choose JPG images</span>
+                        <span class="text-sm text-slate-500 dark:text-slate-400"> or drag and drop them here</span>
+                    </div>
+                    <p class="text-xs text-slate-400">Select multiple JPG/JPEG files &bull; 100% In-Browser</p>
+                </div>
+            </div>
+
+            <div id="settingsBox" class="hidden bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 p-6 sm:p-8 shadow-xs space-y-6 transition-colors">
+                <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-700/80 pb-4">
+                    <h2 class="text-base font-bold text-slate-900 dark:text-white">Document Settings</h2>
+                    <span id="jpgCountBadge" class="text-xs font-bold px-2.5 py-1 rounded-full bg-pink-100 dark:bg-pink-950/60 text-pink-700 dark:text-pink-300">0 images</span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">Page Size</label>
+                        <select id="pageSizeSelect" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-semibold">
+                            <option value="A4" selected>A4 (210 &times; 297 mm)</option>
+                            <option value="LETTER">US Letter (8.5 &times; 11 in)</option>
+                            <option value="FIT">Fit Page to Image Dimensions</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">Page Orientation</label>
+                        <select id="orientationSelect" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-semibold">
+                            <option value="portrait" selected>Portrait</option>
+                            <option value="landscape">Landscape</option>
+                            <option value="auto">Auto (Match Image)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">Page Margins</label>
+                        <select id="marginSelect" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-semibold">
+                            <option value="0">No Margins (Full Bleed)</option>
+                            <option value="20" selected>Small Margins (20 pt)</option>
+                            <option value="40">Standard Margins (40 pt)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Reorder Images List -->
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Reorder Sequence</label>
+                    <div id="imageListContainer" class="space-y-2 max-h-72 overflow-y-auto pr-1"></div>
+                </div>
+
+                <div class="pt-2 flex flex-wrap gap-3">
+                    <button type="button" id="processBtn" class="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-pink-600 hover:bg-pink-700 text-white font-bold text-sm shadow-md shadow-pink-200 dark:shadow-none transition">
+                        <i class="fa-solid fa-file-pdf"></i>
+                        <span>Generate PDF Now</span>
+                    </button>
+                    <button type="button" id="resetBtn" class="px-5 py-3.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-sm transition">
+                        Reset
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="resultContainer" class="hidden bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 p-8 shadow-sm text-center transition-colors">
+            <div class="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto mb-4 text-2xl shadow-2xs">
+                <i class="fa-solid fa-check"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-1">PDF Created Successfully!</h2>
+            <p class="text-slate-500 dark:text-slate-400 text-sm mb-6">Your JPGs have been compiled into a high-quality PDF.</p>
+
+            <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-700/60 max-w-sm mx-auto mb-8 text-center">
+                <span class="text-xs font-bold text-slate-400 uppercase">Document Size</span>
+                <div id="resPdfSize" class="text-lg font-bold text-slate-800 dark:text-slate-200 mt-1">0 KB</div>
+                <div id="resPageCount" class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">0 pages</div>
+            </div>
+
+            <div class="flex flex-wrap items-center justify-center gap-3">
+                <button type="button" id="downloadBtn" class="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-pink-600 hover:bg-pink-700 text-white font-bold text-sm shadow-md shadow-pink-200 dark:shadow-none transition">
+                    <i class="fa-solid fa-download"></i>
+                    <span>Download PDF</span>
+                </button>
+                <button type="button" id="processAnotherBtn" class="px-5 py-3.5 rounded-xl border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-sm transition">
+                    Convert Other JPGs
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-6 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500 dark:text-slate-400">
+            &copy; 2026 FileGenius &bull; In-Browser JPG to PDF Converter
+        </div>
+    </footer>
+
+    <script src="../../assets/js/utils.js"></script>
+    <script src="../../assets/js/navigation.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const fileInput = document.getElementById('fileInput');
+            const dropZone = document.getElementById('dropZone');
+            const settingsBox = document.getElementById('settingsBox');
+            const jpgCountBadge = document.getElementById('jpgCountBadge');
+            const imageListContainer = document.getElementById('imageListContainer');
+            const pageSizeSelect = document.getElementById('pageSizeSelect');
+            const orientationSelect = document.getElementById('orientationSelect');
+            const marginSelect = document.getElementById('marginSelect');
+
+            const processBtn = document.getElementById('processBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const toolFormContainer = document.getElementById('toolFormContainer');
+            const resultContainer = document.getElementById('resultContainer');
+            const resPdfSize = document.getElementById('resPdfSize');
+            const resPageCount = document.getElementById('resPageCount');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const processAnotherBtn = document.getElementById('processAnotherBtn');
+            const errorAlert = document.getElementById('errorAlert');
+            const errorMessage = document.getElementById('errorMessage');
+
+            let imagesList = [];
+            let pdfBlob = null;
+
+            function showError(msg) {
+                errorMessage.textContent = msg;
+                errorAlert.classList.remove('hidden');
+            }
+            function hideError() {
+                errorAlert.classList.add('hidden');
+            }
+
+            FileGenius.Utils.setupDropzone(dropZone, fileInput, (files) => {
+                if (files && files.length > 0) handleFiles(Array.from(files));
+            });
+
+            function handleFiles(files) {
+                hideError();
+                const valid = files.filter(f => f.type === 'image/jpeg' || f.name.match(/\.(jpe?g)$/i));
+                if (valid.length === 0) {
+                    showError('Please upload valid JPG/JPEG images.');
+                    return;
+                }
+                valid.forEach(f => imagesList.push({ file: f, name: f.name, size: f.size }));
+                renderImageList();
+                settingsBox.classList.remove('hidden');
+            }
+
+            function renderImageList() {
+                imageListContainer.innerHTML = '';
+                jpgCountBadge.textContent = `${imagesList.length} image${imagesList.length > 1 ? 's' : ''}`;
+
+                imagesList.forEach((item, index) => {
+                    const row = document.createElement('div');
+                    row.className = 'p-3 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-200/80 dark:border-slate-700/60 flex items-center justify-between text-xs';
+                    row.innerHTML = `
+                        <div class="flex items-center gap-2 overflow-hidden">
+                            <span class="w-5 h-5 rounded-full bg-slate-200 dark:bg-slate-700 text-xxs font-bold flex items-center justify-center flex-shrink-0">${index + 1}</span>
+                            <span class="font-bold text-slate-800 dark:text-slate-100 truncate max-w-[200px] sm:max-w-xs">${item.name}</span>
+                            <span class="text-xxs text-slate-400">(${FileGenius.Utils.formatBytes(item.size)})</span>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <button type="button" class="btn-up p-1.5 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 ${index === 0 ? 'opacity-30 pointer-events-none' : ''}">
+                                <i class="fa-solid fa-arrow-up"></i>
+                            </button>
+                            <button type="button" class="btn-down p-1.5 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 ${index === imagesList.length - 1 ? 'opacity-30 pointer-events-none' : ''}">
+                                <i class="fa-solid fa-arrow-down"></i>
+                            </button>
+                            <button type="button" class="btn-remove p-1.5 rounded-lg hover:bg-red-50 text-red-500 hover:text-red-700">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </div>
+                    `;
+
+                    row.querySelector('.btn-up').addEventListener('click', () => {
+                        if (index > 0) {
+                            const tmp = imagesList[index];
+                            imagesList[index] = imagesList[index - 1];
+                            imagesList[index - 1] = tmp;
+                            renderImageList();
+                        }
+                    });
+
+                    row.querySelector('.btn-down').addEventListener('click', () => {
+                        if (index < imagesList.length - 1) {
+                            const tmp = imagesList[index];
+                            imagesList[index] = imagesList[index + 1];
+                            imagesList[index + 1] = tmp;
+                            renderImageList();
+                        }
+                    });
+
+                    row.querySelector('.btn-remove').addEventListener('click', () => {
+                        imagesList.splice(index, 1);
+                        renderImageList();
+                        if (imagesList.length === 0) settingsBox.classList.add('hidden');
+                    });
+
+                    imageListContainer.appendChild(row);
+                });
+            }
+
+            processBtn.addEventListener('click', async () => {
+                if (imagesList.length === 0) return;
+                hideError();
+
+                try {
+                    const { PDFDocument, PageSizes } = PDFLib;
+                    const pdfDoc = await PDFDocument.create();
+
+                    const pagePreset = pageSizeSelect.value;
+                    const orientation = orientationSelect.value;
+                    const margin = parseInt(marginSelect.value);
+
+                    for (const item of imagesList) {
+                        const buffer = await FileGenius.Utils.readFileAsArrayBuffer(item.file);
+                        const embeddedImage = await pdfDoc.embedJpg(buffer);
+
+                        const imgW = embeddedImage.width;
+                        const imgH = embeddedImage.height;
+
+                        let pageW, pageH;
+                        if (pagePreset === 'A4') {
+                            pageW = PageSizes.A4[0]; pageH = PageSizes.A4[1];
+                        } else if (pagePreset === 'LETTER') {
+                            pageW = PageSizes.Letter[0]; pageH = PageSizes.Letter[1];
+                        } else {
+                            pageW = imgW + margin * 2;
+                            pageH = imgH + margin * 2;
+                        }
+
+                        if (pagePreset !== 'FIT') {
+                            if (orientation === 'landscape' && pageH > pageW) {
+                                [pageW, pageH] = [pageH, pageW];
+                            } else if (orientation === 'portrait' && pageW > pageH) {
+                                [pageW, pageH] = [pageH, pageW];
+                            } else if (orientation === 'auto') {
+                                if (imgW > imgH && pageH > pageW) {
+                                    [pageW, pageH] = [pageH, pageW];
+                                } else if (imgH > imgW && pageW > pageH) {
+                                    [pageW, pageH] = [pageH, pageW];
+                                }
+                            }
+                        }
+
+                        const page = pdfDoc.addPage([pageW, pageH]);
+                        const availW = pageW - margin * 2;
+                        const availH = pageH - margin * 2;
+
+                        const scale = Math.min(availW / imgW, availH / imgH);
+                        const drawW = imgW * scale;
+                        const drawH = imgH * scale;
+
+                        const x = margin + (availW - drawW) / 2;
+                        const y = margin + (availH - drawH) / 2;
+
+                        page.drawImage(embeddedImage, { x, y, width: drawW, height: drawH });
+                    }
+
+                    const pdfBytes = await pdfDoc.save();
+                    pdfBlob = new Blob([pdfBytes], { type: 'application/pdf' });
+
+                    resPdfSize.textContent = FileGenius.Utils.formatBytes(pdfBlob.size);
+                    resPageCount.textContent = `${imagesList.length} pages`;
+
+                    toolFormContainer.classList.add('hidden');
+                    resultContainer.classList.remove('hidden');
+                } catch (err) {
+                    showError('Failed to generate PDF: ' + err.message);
+                }
+            });
+
+            downloadBtn.addEventListener('click', () => {
+                if (pdfBlob) FileGenius.Utils.downloadBlob(pdfBlob, 'converted_jpgs.pdf');
+            });
+
+            function resetAll() {
+                imagesList = [];
+                pdfBlob = null;
+                fileInput.value = '';
+                imageListContainer.innerHTML = '';
+                settingsBox.classList.add('hidden');
+                resultContainer.classList.add('hidden');
+                toolFormContainer.classList.remove('hidden');
+                hideError();
+            }
+
+            resetBtn.addEventListener('click', resetAll);
+            processAnotherBtn.addEventListener('click', resetAll);
+        });
+    </script>
+</body>
+</html>
+
+
